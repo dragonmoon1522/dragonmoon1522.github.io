@@ -23,15 +23,20 @@
 
                 for (let repo of repos) {
                     const versionURL = `https://raw.githubusercontent.com/${usuarioGitHub}/${repo.name}/main/version.md`;
+                    const readmeURL = `https://raw.githubusercontent.com/${usuarioGitHub}/${repo.name}/main/README.md`;
+                    const versionPage = `https://${usuarioGitHub}.github.io/${repo.name}/version.md`;
+                    const readmePage = `https://${usuarioGitHub}.github.io/${repo.name}/`;
 
-                    // Verificar si existe version.md
+                    // Verificar si existen `version.md` y `README.md`
                     try {
                         const versionRespuesta = await fetch(versionURL);
                         if (versionRespuesta.ok) {
                             proyectosConVersion.push({
                                 nombre: repo.name,
                                 url: versionURL,
-                                repo: repo.html_url
+                                repo: repo.html_url,
+                                versionPage: versionPage,
+                                readmePage: readmePage
                             });
                         }
                     } catch (error) {
@@ -39,7 +44,7 @@
                     }
                 }
 
-                // Ahora cargamos las versiones de los repos que sí tienen version.md
+                // Cargar las versiones de los repos que sí tienen version.md
                 cargarUltimaVersion(proyectosConVersion);
             } catch (error) {
                 console.error("Error al obtener los repositorios:", error);
@@ -56,7 +61,7 @@
 
                     const texto = await respuesta.text();
 
-                    // Extraer solo la primera versión del archivo (asume que empieza con "## X.X.X - YYYY-MM-DD")
+                    // Extraer solo la primera versión del archivo
                     const lineas = texto.split("\n");
                     let ultimaVersion = "";
                     let detalles = "";
@@ -78,7 +83,10 @@
                         <h2>${proyecto.nombre}</h2>
                         <p><strong>Última versión:</strong> ${ultimaVersion}</p>
                         <pre>${detalles.trim()}</pre>
-                        <p><a href="${proyecto.repo}" target="_blank">Ver historial completo</a></p>
+                        <p>
+                            <a href="${proyecto.versionPage}" target="_blank">Ver historial completo</a> |
+                            <a href="${proyecto.readmePage}" target="_blank">Ver proyecto</a>
+                        </p>
                     `;
                     contenedor.appendChild(seccion);
                 } catch (error) {
