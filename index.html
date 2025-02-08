@@ -3,10 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Últimas versiones de mis proyectos</title>
+    <title>KathWare Proyectos</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            padding: 20px;
+            max-width: 800px;
+            margin: auto;
+        }
+        h1 {
+            text-align: center;
+            color: #444;
+        }
+        .proyecto {
+            background: #fff;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .proyecto h2 {
+            margin-bottom: 5px;
+            color: #2a7ae2;
+        }
+        .links {
+            margin-top: 10px;
+        }
+        .links a {
+            color: #0073e6;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .links a:hover {
+            text-decoration: underline;
+        }
+        details {
+            margin-top: 10px;
+            background: #f9f9f9;
+            padding: 8px;
+            border-radius: 5px;
+        }
+        summary {
+            font-weight: bold;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
-    <h1>Últimas versiones de mis proyectos</h1>
+
+    <h1>KathWare Proyectos</h1>
+    <p><strong>Autor:</strong> Katherine Vargas | <a href="https://kathware.com.ar" target="_blank">KathWare</a></p>
     <div id="versiones"></div>
 
     <script>
@@ -27,7 +75,24 @@
                     const versionPage = `https://${usuarioGitHub}.github.io/${repo.name}/version.md`;
                     const readmePage = `https://${usuarioGitHub}.github.io/${repo.name}/`;
 
-                    // Verificar si existen `version.md` y `README.md`
+                    let descripcion = "";
+                    try {
+                        const readmeRespuesta = await fetch(readmeURL);
+                        if (readmeRespuesta.ok) {
+                            const readmeTexto = await readmeRespuesta.text();
+                            const lineas = readmeTexto.split("\n");
+                            for (let linea of lineas) {
+                                if (linea.startsWith("## 📌 **Descripción del Proyecto**")) {
+                                    descripcion = lineas.slice(lineas.indexOf(linea) + 1, lineas.indexOf(linea) + 5).join(" ");
+                                    break;
+                                }
+                            }
+                        }
+                    } catch (error) {
+                        console.log(`No se encontró README.md en ${repo.name}`);
+                    }
+
+                    // Verificar si existe `version.md`
                     try {
                         const versionRespuesta = await fetch(versionURL);
                         if (versionRespuesta.ok) {
@@ -36,7 +101,8 @@
                                 url: versionURL,
                                 repo: repo.html_url,
                                 versionPage: versionPage,
-                                readmePage: readmePage
+                                readmePage: readmePage,
+                                descripcion: descripcion
                             });
                         }
                     } catch (error) {
@@ -79,14 +145,19 @@
 
                     // Mostrar en la página
                     const seccion = document.createElement("div");
+                    seccion.className = "proyecto";
                     seccion.innerHTML = `
-                        <h2>${proyecto.nombre}</h2>
-                        <p><strong>Última versión:</strong> ${ultimaVersion}</p>
-                        <pre>${detalles.trim()}</pre>
-                        <p>
-                            <a href="${proyecto.versionPage}" target="_blank">Ver historial completo</a> |
-                            <a href="${proyecto.readmePage}" target="_blank">Ver proyecto</a>
-                        </p>
+                        <h2><a href="${proyecto.repo}" target="_blank">${proyecto.nombre}</a></h2>
+                        <p><strong>📌 Descripción:</strong> ${proyecto.descripcion || "Descripción no disponible."}</p>
+                        <p><strong>📅 Última versión:</strong> ${ultimaVersion}</p>
+                        <details>
+                            <summary>🔍 Ver detalles de la versión</summary>
+                            <pre>${detalles.trim()}</pre>
+                        </details>
+                        <div class="links">
+                            <a href="${proyecto.versionPage}" target="_blank">📜 Ver historial completo</a> |
+                            <a href="${proyecto.readmePage}" target="_blank">📂 Ver proyecto</a>
+                        </div>
                     `;
                     contenedor.appendChild(seccion);
                 } catch (error) {
