@@ -62,9 +62,10 @@
                     const politicaPrivacidadURL = `https://raw.githubusercontent.com/${usuarioGitHub}/${repo.name}/main/Politica%20de%20Privacidad.md`;
 
                     let descripcion = "No hay descripción disponible.";
+                    let ultimaVersion = "Versión desconocida";
                     let politicaPrivacidadExiste = false;
 
-                    // Verificar si `Politica de Privacidad.md` existe
+                    // 🔹 Verificar si `Politica de Privacidad.md` existe
                     try {
                         const politicaRespuesta = await fetch(politicaPrivacidadURL);
                         if (politicaRespuesta.ok) {
@@ -74,7 +75,7 @@
                         console.log(`No se encontró Política de Privacidad en ${repo.name}`);
                     }
 
-                    // Intentar obtener la descripción desde el README.md
+                    // 🔹 Obtener la descripción desde el README.md
                     try {
                         const readmeRespuesta = await fetch(readmeURL);
                         if (readmeRespuesta.ok) {
@@ -92,7 +93,8 @@
 
                                 if (capturando) {
                                     if (lineas[i].trim() === "---") break; // Detenerse al encontrar la separación
-                                    descripcionArray.push(lineas[i].trim());
+                                    let lineaLimpia = lineas[i].replace(/[#*]/g, "").trim(); // Eliminar `#` y `**`
+                                    if (lineaLimpia) descripcionArray.push(lineaLimpia);
                                 }
                             }
 
@@ -104,29 +106,38 @@
                         console.log(`No se encontró README.md en ${repo.name}`);
                     }
 
-                    // Verificar si `version.md` existe
+                    // 🔹 Obtener la última versión desde version.md
                     try {
                         const versionRespuesta = await fetch(versionURL);
                         if (versionRespuesta.ok) {
                             const textoVersion = await versionRespuesta.text();
-                            const primeraLinea = textoVersion.split("\n")[0].replace(/^## /, ""); // Obtener la última versión
-                            proyectosConVersion.push({
-                                nombre: repo.name,
-                                url: versionURL,
-                                repo: repo.html_url,
-                                versionPage: versionPage,
-                                readmePage: readmePage,
-                                politicaPrivacidadURL: politicaPrivacidadExiste ? `https://${usuarioGitHub}.github.io/${repo.name}/Politica%20de%20Privacidad` : null,
-                                descripcion: descripcion,
-                                ultimaVersion: primeraLinea || "Versión desconocida"
-                            });
+                            const lineasVersion = textoVersion.split("\n");
+
+                            for (let linea of lineasVersion) {
+                                let lineaLimpia = linea.replace(/[#*]/g, "").trim(); // Quitar `#` y `**`
+                                if (lineaLimpia.match(/^\d+\.\d+\.\d+/)) { // Buscar formato de versión (ej: 1.2.0)
+                                    ultimaVersion = lineaLimpia;
+                                    break;
+                                }
+                            }
                         }
                     } catch (error) {
                         console.log(`No se encontró version.md en ${repo.name}`);
                     }
+
+                    proyectosConVersion.push({
+                        nombre: repo.name,
+                        url: versionURL,
+                        repo: repo.html_url,
+                        versionPage: versionPage,
+                        readmePage: readmePage,
+                        politicaPrivacidadURL: politicaPrivacidadExiste ? `https://${usuarioGitHub}.github.io/${repo.name}/Politica%20de%20Privacidad` : null,
+                        descripcion: descripcion,
+                        ultimaVersion: ultimaVersion
+                    });
                 }
 
-                // Mostrar los proyectos con `version.md`
+                // 🔹 Mostrar los proyectos con `version.md`
                 cargarUltimaVersion(proyectosConVersion);
             } catch (error) {
                 console.error("Error al obtener los repositorios:", error);
