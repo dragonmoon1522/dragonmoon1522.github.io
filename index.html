@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Últimas versiones de mis proyectos</title>
+</head>
+<body>
+    <h1>Últimas versiones de mis proyectos</h1>
+    <div id="versiones"></div>
+
+    <script>
+        const usuarioGitHub = "dragonmoon1522"; // Tu usuario de GitHub
+        const apiRepos = `https://api.github.com/users/${usuarioGitHub}/repos`;
+
+        async function obtenerRepositorios() {
+            try {
+                const respuesta = await fetch(apiRepos);
+                if (!respuesta.ok) throw new Error("No se pudo obtener la lista de repositorios.");
+
+                const repos = await respuesta.json();
+                const proyectosConVersion = [];
+
+                for (let repo of repos) {
+                    const versionURL = `https://raw.githubusercontent.com/${usuarioGitHub}/${repo.name}/main/version.md`;
+
+                    // Verificar si existe version.md
+                    try {
+                        const versionRespuesta = await fetch(versionURL);
+                        if (versionRespuesta.ok) {
+                            proyectosConVersion.push({
+                                nombre: repo.name,
+                                url: versionURL,
+                                repo: repo.html_url
+                            });
+                        }
+                    } catch (error) {
+                        console.log(`No se encontró version.md en ${repo.name}`);
+                    }
+                }
+
+                // Ahora cargamos las versiones de los repos que sí tienen version.md
+                cargarUltimaVersion(proyectosConVersion);
+            } catch (error) {
+                console.error("Error al obtener los repositorios:", error);
+            }
+        }
+
+        async function cargarUltimaVersion(proyectos) {
+            const contenedor = document.getElementById("versiones");
+
+            for (let proyecto of proyectos) {
+                try {
+                    const respuesta = await fetch(proyecto.url);
+                    if (!respuesta.ok) throw new Error("No se pudo obtener el archivo version.md");
+
+                    const texto = await respuesta.text();
+
+                    // Extraer solo la primera versión del archivo (asume que empieza con "## X.X.X - YYYY-MM-DD")
+                    const lineas = texto.split("\n");
+                    let ultimaVersion = "";
+                    let detalles = "";
+                    let capturando = false;
+
+                    for (let linea of lineas) {
+                        if (linea.startsWith("## ")) {
+                            if (capturando) break; // Si ya empezó otra versión, corta aquí
+                            ultimaVersion = linea.replace(/^## /, ""); // Quitar "## "
+                            capturando = true;
+                        } else if (capturando) {
+                            detalles += linea + "\n"; // Agregar el detalle de la versión
+                        }
+                    }
+
+                    // Mostrar en la página
+                    const seccion = document.createElement("div");
+                    seccion.innerHTML = `
+                        <h2>${proyecto.nombre}</h2>
+                        <p><strong>Última versión:</strong> ${ultimaVersion}</p>
+                        <pre>${detalles.trim()}</pre>
+                        <p><a href="${proyecto.repo}" target="_blank">Ver historial completo</a></p>
+                    `;
+                    contenedor.appendChild(seccion);
+                } catch (error) {
+                    console.error(`Error cargando ${proyecto.nombre}:`, error);
+                }
+            }
+        }
+
+        obtenerRepositorios();
+    </script>
+</body>
+</html>
