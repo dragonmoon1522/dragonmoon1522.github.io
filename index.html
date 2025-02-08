@@ -59,21 +59,45 @@
                     const readmeURL = `https://raw.githubusercontent.com/${usuarioGitHub}/${repo.name}/main/README.md`;
                     const versionPage = `https://${usuarioGitHub}.github.io/${repo.name}/version.md`;
                     const readmePage = `https://${usuarioGitHub}.github.io/${repo.name}/`;
-                    const politicaPrivacidadURL = `https://${usuarioGitHub}.github.io/${repo.name}/Politica%20de%20Privacidad`;
+                    const politicaPrivacidadURL = `https://raw.githubusercontent.com/${usuarioGitHub}/${repo.name}/main/Politica%20de%20Privacidad.md`;
 
-                    let descripcion = "";
-                    
+                    let descripcion = "No hay descripción disponible.";
+                    let politicaPrivacidadExiste = false;
+
+                    // Verificar si `Politica de Privacidad.md` existe
+                    try {
+                        const politicaRespuesta = await fetch(politicaPrivacidadURL);
+                        if (politicaRespuesta.ok) {
+                            politicaPrivacidadExiste = true;
+                        }
+                    } catch (error) {
+                        console.log(`No se encontró Política de Privacidad en ${repo.name}`);
+                    }
+
                     // Intentar obtener la descripción desde el README.md
                     try {
                         const readmeRespuesta = await fetch(readmeURL);
                         if (readmeRespuesta.ok) {
                             const readmeTexto = await readmeRespuesta.text();
                             const lineas = readmeTexto.split("\n");
-                            for (let linea of lineas) {
-                                if (linea.trim() && !linea.startsWith("#")) {  // Omitir títulos
-                                    descripcion = linea.trim();
-                                    break;
+
+                            let descripcionArray = [];
+                            let capturando = false;
+
+                            for (let i = 0; i < lineas.length; i++) {
+                                if (lineas[i].trim().includes("📌 **Descripción del Proyecto**")) {
+                                    capturando = true;
+                                    continue; // Saltar la línea del título
                                 }
+
+                                if (capturando) {
+                                    if (lineas[i].trim() === "---") break; // Detenerse al encontrar la separación
+                                    descripcionArray.push(lineas[i].trim());
+                                }
+                            }
+
+                            if (descripcionArray.length > 0) {
+                                descripcion = descripcionArray.join(" "); // Convertir a un solo párrafo
                             }
                         }
                     } catch (error) {
@@ -92,8 +116,8 @@
                                 repo: repo.html_url,
                                 versionPage: versionPage,
                                 readmePage: readmePage,
-                                politicaPrivacidadURL: politicaPrivacidadURL,
-                                descripcion: descripcion || "No hay descripción disponible.",
+                                politicaPrivacidadURL: politicaPrivacidadExiste ? `https://${usuarioGitHub}.github.io/${repo.name}/Politica%20de%20Privacidad` : null,
+                                descripcion: descripcion,
                                 ultimaVersion: primeraLinea || "Versión desconocida"
                             });
                         }
