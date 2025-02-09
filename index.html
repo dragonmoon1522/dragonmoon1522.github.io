@@ -123,22 +123,23 @@
 
                     // 🔹 Obtener la última versión desde version.md
                     try {
-                        const versionRespuesta = await fetch(repoBaseURL + "version.md");
-                        if (versionRespuesta.ok) {
-                            const textoVersion = await versionRespuesta.text();
-                                    console.log(`📄 Contenido de version.md en ${repo.name}:\n`, textoVersion);
-                            const lineasVersion = textoVersion.split("\n");
-                            for (let linea of lineasVersion) {
-                                let lineaLimpia = linea.replace(/[#*]/g, "").trim();
-                                if (lineaLimpia.match(/^\d+\.\d+\.\d+/)) {
-                                    ultimaVersion = lineaLimpia;
-                                    break;
-                                }
-                            }
-                        }
-                    } catch (error) {
-                        console.log(`No se encontró version.md en ${repo.name}`);
-                    }
+    const versionRespuesta = await fetch(repoBaseURL + "version.md");
+    if (versionRespuesta.ok) {
+        const textoVersion = await versionRespuesta.text();
+        console.log(`📄 Contenido de version.md en ${repo.name}:\n`, textoVersion); // Ver contenido en consola
+        const lineasVersion = textoVersion.split("\n");
+
+        for (let linea of lineasVersion) {
+            let match = linea.match(/(\d+\.\d+\.\d+)/); // Extrae solo el número de versión
+            if (match) {
+                ultimaVersion = match[0]; // Guarda solo el número de versión
+                break;
+            }
+        }
+    }
+} catch (error) {
+    console.log(`No se encontró version.md en ${repo.name}`);
+}
 
                     proyectosConVersion.push({
                         nombre: repo.name.replace(/-/g, " "),
