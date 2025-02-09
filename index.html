@@ -126,6 +126,7 @@
                         const versionRespuesta = await fetch(repoBaseURL + "version.md");
                         if (versionRespuesta.ok) {
                             const textoVersion = await versionRespuesta.text();
+                                    console.log(`📄 Contenido de version.md en ${repo.name}:\n`, textoVersion);
                             const lineasVersion = textoVersion.split("\n");
                             for (let linea of lineasVersion) {
                                 let lineaLimpia = linea.replace(/[#*]/g, "").trim();
