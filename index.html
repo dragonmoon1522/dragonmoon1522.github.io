@@ -58,7 +58,7 @@
                     const repoBaseURL = `https://raw.githubusercontent.com/${usuarioGitHub}/${repo.name}/main/`;
                     const repoPageURL = `https://${usuarioGitHub}.github.io/${repo.name}/`;
 
-                    const archivosRequeridos = ["README.md", "version.md"];
+                    const archivosRequeridos = ["readme.md", "version.md"];
                     let archivosEncontrados = new Set();
                     let otrosArchivosMD = [];
 
@@ -85,17 +85,17 @@
                     }
 
                     // 🔹 Si faltan `README.md` o `version.md`, ignorar el proyecto
-                    if (!archivosEncontrados.has("README.md") || !archivosEncontrados.has("version.md")) {
-                        console.log(`Ignorando ${repo.name} porque falta README.md o version.md.`);
+                    if (!archivosEncontrados.has("readme.md") || !archivosEncontrados.has("version.md")) {
+                        console.log(`Ignorando ${repo.name} porque falta readme.md o version.md.`);
                         continue;
                     }
 
                     let descripcion = "No hay descripción disponible.";
                     let ultimaVersion = "Versión desconocida";
 
-                    // 🔹 Obtener la descripción desde el README.md
+                    // 🔹 Obtener la descripción desde el readme.md
                     try {
-                        const readmeRespuesta = await fetch(repoBaseURL + "README.md");
+                        const readmeRespuesta = await fetch(repoBaseURL + "readme.md");
                         if (readmeRespuesta.ok) {
                             const readmeTexto = await readmeRespuesta.text();
                             const lineas = readmeTexto.split("\n");
@@ -118,7 +118,7 @@
                             }
                         }
                     } catch (error) {
-                        console.log(`No se encontró README.md en ${repo.name}`);
+                        console.log(`No se encontró readme.md en ${repo.name}`);
                     }
 
                     // 🔹 Obtener la última versión desde version.md
@@ -142,7 +142,7 @@
                     proyectosConVersion.push({
                         nombre: repo.name.replace(/-/g, " "),
                         url: repoPageURL,
-                        versionURL: repoPageURL + "version.md",
+                        versionURL: repoPageURL + "version",
                         readmeURL: repoPageURL,
                         descripcion: descripcion,
                         ultimaVersion: ultimaVersion,
