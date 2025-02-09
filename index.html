@@ -92,6 +92,7 @@
 
                     let descripcion = "No hay descripción disponible.";
                     let ultimaVersion = "Versión desconocida";
+                    let detallesVersion = "Sin detalles disponibles.";
 
                     // 🔹 Obtener la descripción desde el readme.md
                     try {
@@ -123,31 +124,43 @@
 
                     // 🔹 Obtener la última versión desde version.md
                     try {
-    const versionRespuesta = await fetch(repoBaseURL + "version.md");
-    if (versionRespuesta.ok) {
-        const textoVersion = await versionRespuesta.text();
-        console.log(`📄 Contenido de version.md en ${repo.name}:\n`, textoVersion); // Ver contenido en consola
-        const lineasVersion = textoVersion.split("\n");
+                        const versionRespuesta = await fetch(repoBaseURL + "version.md");
+                        if (versionRespuesta.ok) {
+                            const textoVersion = await versionRespuesta.text();
+                            console.log(`📄 Contenido de version.md en ${repo.name}:\n`, textoVersion); // Ver contenido en consola
+                            const lineasVersion = textoVersion.split("\n");
 
-        for (let linea of lineasVersion) {
-            let match = linea.match(/(\d+\.\d+\.\d+)/); // Extrae solo el número de versión
-            if (match) {
-                ultimaVersion = match[0]; // Guarda solo el número de versión
-                break;
-            }
-        }
-    }
-} catch (error) {
-    console.log(`No se encontró version.md en ${repo.name}`);
-}
+                            for (let i = 0; i < lineasVersion.length; i++) {
+                                let match = lineasVersion[i].match(/(\d+\.\d+\.\d+)/);
+                                if (match) {
+                                    ultimaVersion = match[0];
+
+                                    // 🔹 Extraer detalles de la versión
+                                    let detalles = [];
+                                    for (let j = i + 1; j < lineasVersion.length; j++) {
+                                        if (lineasVersion[j].trim() === "---" || lineasVersion[j].startsWith("## ")) {
+                                            break; // Detenerse si encuentra otra versión o separador "---"
+                                        }
+                                        detalles.push(lineasVersion[j].trim());
+                                    }
+
+                                    detallesVersion = detalles.length > 0 ? detalles.join("<br>") : "Sin detalles disponibles.";
+                                    break; // Solo queremos la última versión
+                                }
+                            }
+                        }
+                    } catch (error) {
+                        console.log(`No se encontró version.md en ${repo.name}`);
+                    }
 
                     proyectosConVersion.push({
                         nombre: repo.name.replace(/-/g, " "),
                         url: repoPageURL,
-                        versionURL: repoPageURL + "version",
+                        versionURL: repoPageURL + "version.md",
                         readmeURL: repoPageURL,
                         descripcion: descripcion,
                         ultimaVersion: ultimaVersion,
+                        detallesVersion: detallesVersion,
                         otrosArchivosMD: otrosArchivosMD.map(file => ({
                             name: file.replace(".md", ""),
                             url: repoPageURL + file
@@ -179,7 +192,8 @@
                 seccion.innerHTML = `
                     <h2>${proyecto.nombre}</h2>
                     <p>${proyecto.descripcion}</p>
-                    <p><strong>Última versión:</strong> ${proyecto.ultimaVersion}</p>
+                    <h3>Última versión: ${proyecto.ultimaVersion}</h3>
+                    <p>${proyecto.detallesVersion}</p>
                     <p>
                         <a href="${proyecto.versionURL}" class="btn" target="_blank">📜 Ver historial</a>
                         <a href="${proyecto.readmeURL}" class="btn" target="_blank">📂 Ver proyecto</a>
