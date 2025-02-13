@@ -1,6 +1,6 @@
 # Licencia del Contenido
 
-Los textos y descripciones de eventos en este proyecto están licenciados bajo la **Creative Commons BY-NC-SA 4.0**.
+Los documentos que contienen texto o html estático están licenciados bajo la **Creative Commons BY-NC-SA 4.0**.
 
 ### Permisos y restricciones:
 ✔️ **Puedes** compartir y adaptar el contenido.  
