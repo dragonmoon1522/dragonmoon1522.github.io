@@ -37,12 +37,12 @@
             background-color: #0056b3;
         }
     </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/showdown/2.1.0/showdown.min.js"></script>
 </head>
 <body>
     <h1>KathWare Proyectos</h1>
     <div id="versiones"></div>
-
-    <script>
+        <script>
         const usuarioGitHub = "dragonmoon1522";
         const apiRepos = `https://api.github.com/users/${usuarioGitHub}/repos`;
 
@@ -123,35 +123,28 @@
                     }
 
                     // 🔹 Obtener la última versión desde version.md
-                    try {
-                        const versionRespuesta = await fetch(repoBaseURL + "version.md");
-                        if (versionRespuesta.ok) {
-                            const textoVersion = await versionRespuesta.text();
-                            console.log(`📄 Contenido de version.md en ${repo.name}:\n`, textoVersion); // Ver contenido en consola
-                            const lineasVersion = textoVersion.split("\n");
+try {
+    const versionRespuesta = await fetch(repoBaseURL + "version.md");
+    if (versionRespuesta.ok) {
+        const textoVersion = await versionRespuesta.text();
+        console.log(`📄 Contenido de version.md en ${repo.name}:\n`, textoVersion);
 
-                            for (let i = 0; i < lineasVersion.length; i++) {
-                                let match = lineasVersion[i].match(/(\d+\.\d+\.\d+)/);
-                                if (match) {
-                                    ultimaVersion = match[0];
+        const converter = new showdown.Converter(); // Convertidor de Markdown a HTML
+        detallesVersion = converter.makeHtml(textoVersion); // Convertimos Markdown a HTML
 
-                                    // 🔹 Extraer detalles de la versión
-                                    let detalles = [];
-                                    for (let j = i + 1; j < lineasVersion.length; j++) {
-                                        if (lineasVersion[j].trim() === "---" || lineasVersion[j].startsWith("## ")) {
-                                            break; // Detenerse si encuentra otra versión o separador "---"
-                                        }
-                                        detalles.push(lineasVersion[j].trim());
-                                    }
-
-                                    detallesVersion = detalles.length > 0 ? detalles.join("<br>") : "Sin detalles disponibles.";
-                                    break; // Solo queremos la última versión
-                                }
-                            }
-                        }
-                    } catch (error) {
-                        console.log(`No se encontró version.md en ${repo.name}`);
-                    }
+        // 🔹 Extraer solo la última versión (manteniendo tu lógica actual)
+        const lineasVersion = textoVersion.split("\n");
+        for (let i = 0; i < lineasVersion.length; i++) {
+            let match = lineasVersion[i].match(/(\d+\.\d+\.\d+)/);
+            if (match) {
+                ultimaVersion = match[0];
+                break;
+            }
+        }
+    }
+} catch (error) {
+    console.log(`No se encontró version.md en ${repo.name}`);
+}
 
                     proyectosConVersion.push({
                         nombre: repo.name.replace(/-/g, " "),
@@ -193,7 +186,7 @@
                     <h2>${proyecto.nombre}</h2>
                     <p>${proyecto.descripcion}</p>
                     <h3>Última versión: ${proyecto.ultimaVersion}</h3>
-                    <p>${proyecto.detallesVersion}</p>
+                    <div class="version-content">${proyecto.detallesVersion}</div>
                     <p>
                         <a href="${proyecto.versionURL}" class="btn" target="_blank">📜 Ver historial</a>
                         <a href="${proyecto.readmeURL}" class="btn" target="_blank">📂 Ver proyecto</a>
