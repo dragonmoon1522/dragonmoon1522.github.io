@@ -122,15 +122,15 @@
                         console.log(`No se encontró readme.md en ${repo.name}`);
                     }
 
-                    // 🔹 Obtener la última versión desde version.md
-try {
+                    
+                    try {
     const versionRespuesta = await fetch(repoBaseURL + "version.md");
     if (versionRespuesta.ok) {
         const textoVersion = await versionRespuesta.text();
         console.log(`📄 Contenido de version.md en ${repo.name}:\n`, textoVersion);
 
         const converter = new showdown.Converter(); // Convertidor de Markdown a HTML
-        detallesVersion = converter.makeHtml(textoVersion); // Convertimos Markdown a HTML
+        const versionHTML = converter.makeHtml(textoVersion); // Convertimos Markdown a HTML
 
         // 🔹 Extraer solo la última versión (manteniendo tu lógica actual)
         const lineasVersion = textoVersion.split("\n");
@@ -140,6 +140,11 @@ try {
                 ultimaVersion = match[0];
                 break;
             }
+        }
+
+        // Si `versionHTML` tiene contenido, lo asignamos
+        if (versionHTML.trim() !== "") {
+            detallesVersion = versionHTML;
         }
     }
 } catch (error) {
