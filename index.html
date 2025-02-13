@@ -37,205 +37,163 @@
             background-color: #0056b3;
         }
     </style>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/showdown/2.1.0/showdown.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/showdown/2.1.0/showdown.min.js"></script>
 </head>
 <body>
     <h1>KathWare Proyectos</h1>
     
     <h2>📢 Últimas Novedades</h2>
-<div id="novedades"></div>
+    <div id="novedades">Cargando novedades...</div>
 
-<script>
-async function obtenerNovedades() {
-    const urlNews = "https://raw.githubusercontent.com/dragonmoon1522/dragonmoon1522.github.io/main/news.md"; // URL del archivo en GitHub
-
-    try {
-        const respuesta = await fetch(urlNews);
-        if (!respuesta.ok) throw new Error("No se pudo obtener las novedades.");
-
-        const textoNews = await respuesta.text();
-        const converter = new showdown.Converter(); // Convertir Markdown a HTML
-        const newsHTML = converter.makeHtml(textoNews); // Convertimos Markdown a HTML
-
-        document.getElementById("novedades").innerHTML = newsHTML;
-    } catch (error) {
-        console.log("Error obteniendo novedades:", error);
+    <script>
+    async function obtenerNovedades() {
+        const urlNews = "https://raw.githubusercontent.com/dragonmoon1522/dragonmoon1522.github.io/main/news.md";
+        try {
+            const respuesta = await fetch(urlNews);
+            if (!respuesta.ok) throw new Error("No se pudo obtener las novedades.");
+            const textoNews = await respuesta.text();
+            const converter = new showdown.Converter();
+            const newsHTML = converter.makeHtml(textoNews);
+            document.getElementById("novedades").innerHTML = newsHTML;
+        } catch (error) {
+            console.log("Error obteniendo novedades:", error);
+            document.getElementById("novedades").innerHTML = "<p>No se pudieron cargar las novedades en este momento.</p>";
+        }
     }
-}
+    obtenerNovedades();
+    </script>
 
-obtenerNovedades();
-</script>
+    <h2>📰 Última Entrada en KathWare</h2>
+    <div id="ultima-entrada">Cargando la última entrada...</div>
 
+    <script>
+    async function obtenerUltimaEntrada() {
+        const urlFeed = "https://kathware.com.ar/feed/";
+        try {
+            const respuesta = await fetch(urlFeed);
+            if (!respuesta.ok) throw new Error("No se pudo obtener el feed RSS.");
+            const texto = await respuesta.text();
+            const parser = new DOMParser();
+            const xml = parser.parseFromString(texto, "text/xml");
+            const primeraEntrada = xml.querySelector("item");
+            const titulo = primeraEntrada.querySelector("title").textContent;
+            const enlace = primeraEntrada.querySelector("link").textContent;
+            let descripcion = primeraEntrada.querySelector("description").textContent || "No hay resumen disponible.";
+            descripcion = descripcion.replace(/<\/?[^>]+(>|$)/g, "").trim();
+            if (descripcion.length > 150) {
+                descripcion = descripcion.substring(0, 150) + "...";
+            }
+            document.getElementById("ultima-entrada").innerHTML = `
+                <p><strong><a href="${enlace}" target="_blank">${titulo}</a></strong></p>
+                <p>${descripcion}</p>
+            `;
+        } catch (error) {
+            console.log("Error obteniendo la última entrada:", error);
+            document.getElementById("ultima-entrada").innerHTML = "<p>No se pudo cargar la última entrada en este momento.</p>";
+        }
+    }
+    obtenerUltimaEntrada();
+    </script>
+
+    <h2>🚀 Lista de Proyectos</h2>
     <div id="versiones"></div>
-        <script>
+
+    <script>
+    async function obtenerRepositorios() {
         const usuarioGitHub = "dragonmoon1522";
         const apiRepos = `https://api.github.com/users/${usuarioGitHub}/repos`;
+        try {
+            const respuesta = await fetch(apiRepos);
+            if (!respuesta.ok) throw new Error("No se pudo obtener la lista de repositorios.");
+            const repos = await respuesta.json();
+            const proyectosConVersion = [];
 
-        async function obtenerRepositorios() {
-            try {
-                const respuesta = await fetch(apiRepos);
-                if (!respuesta.ok) throw new Error("No se pudo obtener la lista de repositorios.");
+            for (let repo of repos) {
+                const repoBaseURL = `https://raw.githubusercontent.com/${usuarioGitHub}/${repo.name}/main/`;
+                const repoPageURL = `https://${usuarioGitHub}.github.io/${repo.name}/`;
 
-                const repos = await respuesta.json();
-                const proyectosConVersion = [];
+                let descripcion = "No hay descripción disponible.";
+                let ultimaVersion = "Versión desconocida";
+                let detallesVersion = "Sin detalles disponibles.";
 
-                for (let repo of repos) {
-                    const repoBaseURL = `https://raw.githubusercontent.com/${usuarioGitHub}/${repo.name}/main/`;
-                    const repoPageURL = `https://${usuarioGitHub}.github.io/${repo.name}/`;
-
-                    const archivosRequeridos = ["readme.md", "version.md"];
-                    let archivosEncontrados = new Set();
-                    let otrosArchivosMD = [];
-
-                    // 🔹 Obtener lista de archivos en la raíz del repo
-                    const repoContentsURL = `https://api.github.com/repos/${usuarioGitHub}/${repo.name}/contents/`;
-                    let archivos;
-                    try {
-                        const repoContentsResp = await fetch(repoContentsURL);
-                        if (repoContentsResp.ok) {
-                            archivos = await repoContentsResp.json();
-                            archivos.forEach(archivo => {
-                                if (archivo.name.endsWith(".md")) {
-                                    if (archivosRequeridos.includes(archivo.name)) {
-                                        archivosEncontrados.add(archivo.name);
-                                    } else {
-                                        otrosArchivosMD.push(archivo.name);
-                                    }
-                                }
-                            });
-                        }
-                    } catch (error) {
-                        console.log(`No se pudieron obtener archivos en ${repo.name}`);
-                        continue;
+                try {
+                    const readmeRespuesta = await fetch(repoBaseURL + "README.md");
+                    if (readmeRespuesta.ok) {
+                        const textoReadme = await readmeRespuesta.text();
+                        const converter = new showdown.Converter();
+                        descripcion = converter.makeHtml(textoReadme.split("\n").slice(0, 10).join("\n"));
                     }
-
-                    // 🔹 Si faltan `README.md` o `version.md`, ignorar el proyecto
-                    if (!archivosEncontrados.has("readme.md") || !archivosEncontrados.has("version.md")) {
-                        console.log(`Ignorando ${repo.name} porque falta readme.md o version.md.`);
-                        continue;
-                    }
-
-                    let descripcion = "No hay descripción disponible.";
-                    let ultimaVersion = "Versión desconocida";
-                    let detallesVersion = "Sin detalles disponibles.";
-
-                    // 🔹 Obtener la descripción desde el readme.md
-                    try {
-                        const readmeRespuesta = await fetch(repoBaseURL + "readme.md");
-                        if (readmeRespuesta.ok) {
-                            const readmeTexto = await readmeRespuesta.text();
-                            const lineas = readmeTexto.split("\n");
-                            let descripcionArray = [];
-                            let capturando = false;
-
-                            for (let i = 0; i < lineas.length; i++) {
-                                if (lineas[i].trim().includes("📌 **Descripción del Proyecto**")) {
-                                    capturando = true;
-                                    continue;
-                                }
-                                if (capturando) {
-                                    if (lineas[i].trim() === "---") break;
-                                    let lineaLimpia = lineas[i].replace(/[#*]/g, "").trim();
-                                    if (lineaLimpia) descripcionArray.push(lineaLimpia);
-                                }
-                            }
-                            if (descripcionArray.length > 0) {
-                                descripcion = descripcionArray.join(" ");
-                            }
-                        }
-                    } catch (error) {
-                        console.log(`No se encontró readme.md en ${repo.name}`);
-                    }
-
-                    
-                    try {
-    const versionRespuesta = await fetch(repoBaseURL + "version.md");
-    if (versionRespuesta.ok) {
-        const textoVersion = await versionRespuesta.text();
-        console.log(`📄 Contenido de version.md en ${repo.name}:\n`, textoVersion);        
-const lineasVersion = textoVersion.split("\n");
-
-        let detalles = [];
-        let capturando = false;
-
-        for (let i = 0; i < lineasVersion.length; i++) {
-            let match = lineasVersion[i].match(/(\d+\.\d+\.\d+)/);
-            if (match) {
-                ultimaVersion = match[0];
-                capturando = true; // Iniciar captura después de la versión
-                continue;
-            }
-
-            if (capturando) {
-                if (lineasVersion[i].trim() === "---" || lineasVersion[i].startsWith("## ")) {
-                    break; // Detener captura al encontrar otro separador o título
+                } catch (error) {
+                    console.log(`Error obteniendo README.md en ${repo.name}:`, error);
                 }
-                detalles.push(lineasVersion[i].trim());
-            }
-        }
 
-        const converter = new showdown.Converter(); // Convertir Markdown a HTML
-        detallesVersion = detalles.length > 0 ? converter.makeHtml(detalles.join("\n")) : "Sin detalles disponibles.";
+                try {
+                    const versionRespuesta = await fetch(repoBaseURL + "version.md");
+                    if (versionRespuesta.ok) {
+                        const textoVersion = await versionRespuesta.text();
+                        const lineasVersion = textoVersion.split("\n");
+
+                        let detalles = [];
+                        let capturando = false;
+                        for (let i = 0; i < lineasVersion.length; i++) {
+                            let match = lineasVersion[i].match(/(\d+\.\d+\.\d+)/);
+                            if (match) {
+                                ultimaVersion = match[0];
+                                capturando = true;
+                                continue;
+                            }
+                            if (capturando) {
+                                if (lineasVersion[i].trim() === "---" || lineasVersion[i].startsWith("## ")) {
+                                    break;
+                                }
+                                detalles.push(lineasVersion[i].trim());
+                            }
+                        }
+
+                        const converter = new showdown.Converter();
+                        detallesVersion = detalles.length > 0 ? converter.makeHtml(detalles.join("\n")) : "Sin detalles disponibles.";
+                    }
+                } catch (error) {
+                    console.log(`No se encontró version.md en ${repo.name}`);
+                    detallesVersion = "No disponible.";
+                }
+
+                proyectosConVersion.push({
+                    nombre: repo.name.replace(/-/g, " "),
+                    url: repoPageURL,
+                    versionURL: repoPageURL + "version",
+                    readmeURL: repoPageURL,
+                    descripcion: descripcion,
+                    ultimaVersion: ultimaVersion,
+                    detallesVersion: detallesVersion
+                });
+            }
+
+            cargarProyectos(proyectosConVersion);
+        } catch (error) {
+            console.error("Error al obtener los repositorios:", error);
+        }
     }
-} catch (error) {
-    console.log(`No se encontró version.md en ${repo.name}`);
-}
-                    
-proyectosConVersion.push({
-                        nombre: repo.name.replace(/-/g, " "),
-                        url: repoPageURL,
-                        versionURL: repoPageURL + "version",
-                        readmeURL: repoPageURL,
-                        descripcion: descripcion,
-                        ultimaVersion: ultimaVersion,
-                        detallesVersion: detallesVersion,
-                        otrosArchivosMD: otrosArchivosMD.map(file => ({
-                            name: file.replace(".md", ""),
-                            url: repoPageURL + file
-                        }))
-                    });
-                }
 
-                cargarProyectos(proyectosConVersion);
-            } catch (error) {
-                console.error("Error al obtener los repositorios:", error);
-            }
-        }
+    function cargarProyectos(proyectos) {
+        const contenedor = document.getElementById("versiones");
+        proyectos.forEach(proyecto => {
+            const seccion = document.createElement("div");
+            seccion.classList.add("proyecto");
 
-        function cargarProyectos(proyectos) {
-            const contenedor = document.getElementById("versiones");
-
-            for (let proyecto of proyectos) {
-                const seccion = document.createElement("div");
-                seccion.classList.add("proyecto");
-
-                let otrosArchivosEnlaces = "";
-                if (proyecto.otrosArchivosMD.length > 0) {
-                    otrosArchivosEnlaces = "<br><strong>📜 Otros archivos:</strong> ";
-                    proyecto.otrosArchivosMD.forEach(archivo => {
-                        otrosArchivosEnlaces += `<a href="${archivo.url}" class="btn" target="_blank">${archivo.name}</a> `;
-                    });
-                }
-
-                seccion.innerHTML = `
-                    <h2>${proyecto.nombre}</h2>
-                    <p>${proyecto.descripcion}</p>
-                    <h3>Última versión: ${proyecto.ultimaVersion}</h3>
-                    <div class="version-content">${proyecto.detallesVersion}</div>
-                    <p>
-                        <a href="${proyecto.versionURL}" class="btn" target="_blank">📜 Ver historial</a>
-                        <a href="${proyecto.readmeURL}" class="btn" target="_blank">📂 Ver proyecto</a>
-                        ${otrosArchivosEnlaces}
-                    </p>
-                `;
-
-                contenedor.appendChild(seccion);
-            }
-        }
-
-        obtenerRepositorios();
+            seccion.innerHTML = `
+                <h2>${proyecto.nombre}</h2>
+                <p>${proyecto.descripcion}</p>
+                <h3>Última versión: ${proyecto.ultimaVersion}</h3>
+                <div class="version-content">${proyecto.detallesVersion}</div>
+            `;
+            contenedor.appendChild(seccion);
+        });
+    }
+    obtenerRepositorios();
     </script>
+
     <h1>El contenido de KathWare está disponible bajo las siguientes licencias</h1>
-<a href="https://kathware.com.ar/normas-de-uso-y-licencias-de-kathware/">Normas de uso y licencias de KathWare</a>    
+    <a href="https://kathware.com.ar/normas-de-uso-y-licencias-de-kathware/">Normas de uso y licencias de KathWare</a>
 </body>
 </html>
