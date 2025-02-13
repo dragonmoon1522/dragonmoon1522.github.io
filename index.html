@@ -126,9 +126,9 @@
                     try {
                         const versionRespuesta = await fetch(repoBaseURL + "version.md");
                         if (versionRespuesta.ok) {
-                            const versionTexto = await versionRespuesta.text();
+                            const textoVersion = await versionRespuesta.text();
                             console.log(`📄 Contenido de version.md en ${repo.name}:\n`, textoVersion); // Ver contenido en consola
-                            const lineasVersion = versionTexto.split("\n");
+                            const lineasVersion = textoVersion.split("\n");
 
                             for (let i = 0; i < lineasVersion.length; i++) {
                                 let match = lineasVersion[i].match(/(\d+\.\d+\.\d+)/);
