@@ -130,21 +130,32 @@
         console.log(`📄 Contenido de version.md en ${repo.name}:\n`, textoVersion);
 
         const converter = new showdown.Converter(); // Convertidor de Markdown a HTML
-        const versionHTML = converter.makeHtml(textoVersion); // Convertimos Markdown a HTML
-
-        // 🔹 Extraer solo la última versión (manteniendo tu lógica actual)
         const lineasVersion = textoVersion.split("\n");
+
+        let detalles = [];
+        let capturando = false;
+
         for (let i = 0; i < lineasVersion.length; i++) {
             let match = lineasVersion[i].match(/(\d+\.\d+\.\d+)/);
             if (match) {
                 ultimaVersion = match[0];
-                break;
+                capturando = true; // Iniciar captura después de la versión
+                continue;
+            }
+
+            if (capturando) {
+                if (lineasVersion[i].trim() === "---" || lineasVersion[i].startsWith("## ")) {
+                    break; // Detener captura al encontrar otro separador o título
+                }
+                detalles.push(lineasVersion[i].trim());
             }
         }
 
-        // Si `versionHTML` tiene contenido, lo asignamos
-        if (versionHTML.trim() !== "") {
-            detallesVersion = versionHTML;
+        // Convertimos solo la parte capturada a HTML
+        if (detalles.length > 0) {
+            detallesVersion = converter.makeHtml(detalles.join("\n"));
+        } else {
+            detallesVersion = "Sin detalles disponibles.";
         }
     }
 } catch (error) {
