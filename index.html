@@ -41,7 +41,7 @@
 </head>
 <body>
     <h1>KathWare Proyectos</h1>
-    
+
     <h2>📢 Últimas Novedades</h2>
     <div id="novedades">Cargando novedades...</div>
 
@@ -108,23 +108,61 @@
                 let ultimaVersion = "Versión desconocida";
                 let detallesVersion = "Sin detalles disponibles.";
 
+                // 🔹 Obtener la descripción desde el readme.md
                 try {
                     const readmeRespuesta = await fetch(repoBaseURL + "readme.md");
                     if (readmeRespuesta.ok) {
                         const textoReadme = await readmeRespuesta.text();
-                        const converter = new showdown.Converter();
-                        descripcion = converter.makeHtml(textoReadme.split("\n").slice(0, 5).join("\n"));
+                        const lineas = textoReadme.split("\n");
+                        let descripcionArray = [];
+                        let capturando = false;
+
+                        for (let i = 0; i < lineas.length; i++) {
+                            if (lineas[i].trim().includes("📌 **Descripción del Proyecto**")) {
+                                capturando = true;
+                                continue;
+                            }
+                            if (capturando) {
+                                if (lineas[i].trim() === "---") break;
+                                let lineaLimpia = lineas[i].replace(/[#*]/g, "").trim();
+                                if (lineaLimpia) descripcionArray.push(lineaLimpia);
+                            }
+                        }
+                        if (descripcionArray.length > 0) {
+                            descripcion = descripcionArray.join(" ");
+                        }
                     }
                 } catch (error) {
                     console.log(`Error obteniendo README.md en ${repo.name}:`, error);
                 }
 
+                // 🔹 Obtener la última versión desde version.md
                 try {
                     const versionRespuesta = await fetch(repoBaseURL + "version.md");
                     if (versionRespuesta.ok) {
                         const textoVersion = await versionRespuesta.text();
+                        const lineasVersion = textoVersion.split("\n");
+
+                        let detalles = [];
+                        let capturando = false;
+
+                        for (let i = 0; i < lineasVersion.length; i++) {
+                            let match = lineasVersion[i].match(/(\d+\.\d+\.\d+)/);
+                            if (match) {
+                                ultimaVersion = match[0];
+                                capturando = true;
+                                continue;
+                            }
+                            if (capturando) {
+                                if (lineasVersion[i].trim() === "---" || lineasVersion[i].startsWith("## ")) {
+                                    break;
+                                }
+                                detalles.push(lineasVersion[i].trim());
+                            }
+                        }
+
                         const converter = new showdown.Converter();
-                        detallesVersion = converter.makeHtml(textoVersion);
+                        detallesVersion = detalles.length > 0 ? converter.makeHtml(detalles.join("\n")) : "Sin detalles disponibles.";
                     }
                 } catch (error) {
                     console.log(`No se encontró version.md en ${repo.name}`);
