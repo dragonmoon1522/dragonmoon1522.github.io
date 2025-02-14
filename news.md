@@ -1,12 +1,12 @@
-## 🎯 Sobre Mí  
----
-📌 *Este contenido se actualiza dinámicamente en `dragonmoon1522.github.io` y se muestra en KathWare mediante un iframe.* 🚀💜  
+### 🎯 Sobre Mí  
+
+- 📌 *Este contenido se actualiza dinámicamente en `dragonmoon1522.github.io` y se muestra en KathWare mediante un iframe.* 🚀💜  
 
 Cuando no estoy peleando con mi TDAH (o intentando recordar tomar la medicación), estoy trabajando en proyectos que combinan **tecnología, inclusión y creatividad**. A continuación, te presento algunos de ellos.
 
 ---
 
-## 🚀 Proyectos Destacados  
+### 🚀 Proyectos Destacados  
 
 - **📌 Mis Tareas  
 Una app accesible para organizar tus días, incluso cuando tenés 200 cosas en mente.
@@ -47,4 +47,4 @@ En KathWare encontrarás herramientas pensadas para facilitar tu experiencia:
 
 - **🔊 Lectura en voz alta:**  
   Escuchá cualquier entrada del blog con un botón dedicado *(disponible solo en español).*  
-Leé las *nuevas [Normas de uso y licencias de KathWare](https://kathware.com.ar/normas-de-uso-y-licencias-de-kathware/)*    
+- Leé las *nuevas [Normas de uso y licencias de KathWare](https://kathware.com.ar/normas-de-uso-y-licencias-de-kathware/)*    
