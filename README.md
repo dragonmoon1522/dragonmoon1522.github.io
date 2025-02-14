@@ -22,6 +22,11 @@ Este repositorio contiene el código del sitio **GitHub Pages de KathWare**, que
 Si deseas mejorar este proyecto, puedes hacer un **pull request** o reportar problemas en la sección de **Issues**.
 
 ---
+### 📜 **Historial de Versiones**  
+
+🔗 **[📜 Consulta aquí el Historial de Versiones](version.md)**  
+
+---
 ### 📜 **Licencia**  
 Este contenido está licenciado bajo **Creative Commons BY-NC-SA 4.0**.  
 Más información en: [Normas de Uso y Licencias de KathWare](https://kathware.com.ar/normas-de-uso-y-licencias-de-kathware/)
