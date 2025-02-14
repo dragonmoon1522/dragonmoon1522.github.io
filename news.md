@@ -1,7 +1,7 @@
 ## 🎯 Sobre Mí  
-
-📌 *Este contenido se actualiza dinámicamente en `dragonmoon1522.github.io` y se muestra en KathWare mediante un iframe.* 🚀💜  
 ---
+📌 *Este contenido se actualiza dinámicamente en `dragonmoon1522.github.io` y se muestra en KathWare mediante un iframe.* 🚀💜  
+
 Cuando no estoy peleando con mi TDAH (o intentando recordar tomar la medicación), estoy trabajando en proyectos que combinan **tecnología, inclusión y creatividad**. A continuación, te presento algunos de ellos.
 
 ---
