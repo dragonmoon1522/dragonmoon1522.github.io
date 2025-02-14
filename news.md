@@ -5,7 +5,7 @@ Cuando no estoy peleando con mi TDAH (o intentando recordar tomar la medicación
 
 ## 🚀 Proyectos Destacados  
 
-### 📌 Mis Tareas  
+- **📌 Mis Tareas  
 Una app accesible para organizar tus días, incluso cuando tenés 200 cosas en mente.
 
 - **💊 [Pastillas Inspiradoras](https://www.amazon.es/dp/B0DSBSYWMJ/):**  
