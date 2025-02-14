@@ -78,7 +78,7 @@
             const primeraEntrada = xml.querySelector("item");
             const titulo = primeraEntrada.querySelector("title").textContent;
             const enlace = primeraEntrada.querySelector("link").textContent;
-            let descripcion = primeraEntrada.querySelector("description").textContent || "No hay resumen disponible.";
+            let descripcion = primeraEntrada.querySelector("description")?.textContent || "No hay resumen disponible.";
             descripcion = descripcion.replace(/<\/?[^>]+(>|$)/g, "").trim();
             if (descripcion.length > 150) {
                 descripcion = descripcion.substring(0, 150) + "...";
@@ -112,6 +112,30 @@
                 const repoBaseURL = `https://raw.githubusercontent.com/${usuarioGitHub}/${repo.name}/main/`;
                 const repoPageURL = `https://${usuarioGitHub}.github.io/${repo.name}/`;
 
+                const archivosRequeridos = ["README.md", "version.md"];
+                let archivosEncontrados = new Set();
+
+                const repoContentsURL = `https://api.github.com/repos/${usuarioGitHub}/${repo.name}/contents/`;
+                try {
+                    const repoContentsResp = await fetch(repoContentsURL);
+                    if (repoContentsResp.ok) {
+                        const archivos = await repoContentsResp.json();
+                        archivos.forEach(archivo => {
+                            if (archivosRequeridos.includes(archivo.name.toLowerCase())) {
+                                archivosEncontrados.add(archivo.name.toLowerCase());
+                            }
+                        });
+                    }
+                } catch (error) {
+                    console.log(`No se pudieron obtener archivos en ${repo.name}`);
+                    continue;
+                }
+
+                if (!archivosEncontrados.has("readme.md") || !archivosEncontrados.has("version.md")) {
+                    console.log(`Ignorando ${repo.name} porque falta README.md o version.md.`);
+                    continue;
+                }
+
                 let descripcion = "No hay descripción disponible.";
                 let ultimaVersion = "Versión desconocida";
                 let detallesVersion = "Sin detalles disponibles.";
@@ -121,7 +145,7 @@
                     if (readmeRespuesta.ok) {
                         const textoReadme = await readmeRespuesta.text();
                         const converter = new showdown.Converter();
-                        descripcion = converter.makeHtml(textoReadme.split("\n").slice(0, 10).join("\n"));
+                        descripcion = converter.makeHtml(textoReadme.split("\n").slice(0, 5).join("\n"));
                     }
                 } catch (error) {
                     console.log(`Error obteniendo README.md en ${repo.name}:`, error);
@@ -131,27 +155,8 @@
                     const versionRespuesta = await fetch(repoBaseURL + "version.md");
                     if (versionRespuesta.ok) {
                         const textoVersion = await versionRespuesta.text();
-                        const lineasVersion = textoVersion.split("\n");
-
-                        let detalles = [];
-                        let capturando = false;
-                        for (let i = 0; i < lineasVersion.length; i++) {
-                            let match = lineasVersion[i].match(/(\d+\.\d+\.\d+)/);
-                            if (match) {
-                                ultimaVersion = match[0];
-                                capturando = true;
-                                continue;
-                            }
-                            if (capturando) {
-                                if (lineasVersion[i].trim() === "---" || lineasVersion[i].startsWith("## ")) {
-                                    break;
-                                }
-                                detalles.push(lineasVersion[i].trim());
-                            }
-                        }
-
                         const converter = new showdown.Converter();
-                        detallesVersion = detalles.length > 0 ? converter.makeHtml(detalles.join("\n")) : "Sin detalles disponibles.";
+                        detallesVersion = converter.makeHtml(textoVersion);
                     }
                 } catch (error) {
                     console.log(`No se encontró version.md en ${repo.name}`);
