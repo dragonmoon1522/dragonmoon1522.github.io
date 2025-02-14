@@ -20,7 +20,7 @@ Una app accesible para organizar tus días, incluso cuando tenés 200 cosas en m
 
 - **🔗 Integraciones con IFTTT:**  
   Automatización inteligente para conectar apps y servicios.  
-  *Descubrí mis [applets publicados](https://ifttt.com/p/katherinevargas1522).*  
+  *Descubrí mis [applets publicados](https://ifttt.com/p/dragonmoon1522).*  
 
 ---
 
