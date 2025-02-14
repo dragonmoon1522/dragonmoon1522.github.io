@@ -63,38 +63,6 @@
     obtenerNovedades();
     </script>
 
-    <h2>📰 Última Entrada en KathWare</h2>
-    <div id="ultima-entrada">Cargando la última entrada...</div>
-
-    <script>
-    async function obtenerUltimaEntrada() {
-        const urlFeed = "https://kathware.com.ar/feed/";
-        try {
-            const respuesta = await fetch(urlFeed);
-            if (!respuesta.ok) throw new Error("No se pudo obtener el feed RSS.");
-            const texto = await respuesta.text();
-            const parser = new DOMParser();
-            const xml = parser.parseFromString(texto, "text/xml");
-            const primeraEntrada = xml.querySelector("item");
-            const titulo = primeraEntrada.querySelector("title").textContent;
-            const enlace = primeraEntrada.querySelector("link").textContent;
-            let descripcion = primeraEntrada.querySelector("description")?.textContent || "No hay resumen disponible.";
-            descripcion = descripcion.replace(/<\/?[^>]+(>|$)/g, "").trim();
-            if (descripcion.length > 150) {
-                descripcion = descripcion.substring(0, 150) + "...";
-            }
-            document.getElementById("ultima-entrada").innerHTML = `
-                <p><strong><a href="${enlace}" target="_blank">${titulo}</a></strong></p>
-                <p>${descripcion}</p>
-            `;
-        } catch (error) {
-            console.log("Error obteniendo la última entrada:", error);
-            document.getElementById("ultima-entrada").innerHTML = "<p>No se pudo cargar la última entrada en este momento.</p>";
-        }
-    }
-    obtenerUltimaEntrada();
-    </script>
-
     <h2>🚀 Lista de Proyectos</h2>
     <div id="versiones"></div>
 
@@ -112,7 +80,7 @@
                 const repoBaseURL = `https://raw.githubusercontent.com/${usuarioGitHub}/${repo.name}/main/`;
                 const repoPageURL = `https://${usuarioGitHub}.github.io/${repo.name}/`;
 
-                const archivosRequeridos = ["README.md", "version.md"];
+                const archivosRequeridos = ["readme.md", "version.md"];
                 let archivosEncontrados = new Set();
 
                 const repoContentsURL = `https://api.github.com/repos/${usuarioGitHub}/${repo.name}/contents/`;
@@ -121,8 +89,8 @@
                     if (repoContentsResp.ok) {
                         const archivos = await repoContentsResp.json();
                         archivos.forEach(archivo => {
-                            if (archivosRequeridos.includes(archivo.name.toLowerCase())) {
-                                archivosEncontrados.add(archivo.name.toLowerCase());
+                            if (archivosRequeridos.includes(archivo.name)) {
+                                archivosEncontrados.add(archivo.name);
                             }
                         });
                     }
@@ -132,7 +100,7 @@
                 }
 
                 if (!archivosEncontrados.has("readme.md") || !archivosEncontrados.has("version.md")) {
-                    console.log(`Ignorando ${repo.name} porque falta README.md o version.md.`);
+                    console.log(`Ignorando ${repo.name} porque falta readme.md o version.md.`);
                     continue;
                 }
 
@@ -141,7 +109,7 @@
                 let detallesVersion = "Sin detalles disponibles.";
 
                 try {
-                    const readmeRespuesta = await fetch(repoBaseURL + "README.md");
+                    const readmeRespuesta = await fetch(repoBaseURL + "readme.md");
                     if (readmeRespuesta.ok) {
                         const textoReadme = await readmeRespuesta.text();
                         const converter = new showdown.Converter();
