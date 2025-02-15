@@ -214,6 +214,51 @@
     obtenerRepositorios();
     </script>
 
+    <div id="latest-post">
+        <p>Cargando la última entrada...</p>
+    </div>
+
+    <script>
+        // URL del feed RSS de KathWare
+        const feedUrl = "https://kathware.com.ar/feed/";
+
+        async function getLatestPost() {
+            try {
+                const response = await fetch(feedUrl);
+                const text = await response.text();
+                const parser = new DOMParser();
+                const xml = parser.parseFromString(text, "application/xml");
+
+                // Obtener el primer <item> del RSS
+                const firstItem = xml.querySelector("item");
+                if (!firstItem) {
+                    document.getElementById("latest-post").innerHTML = "<p>No se encontró ninguna entrada.</p>";
+                    return;
+                }
+
+                // Extraer la información relevante
+                const title = firstItem.querySelector("title").textContent;
+                const link = firstItem.querySelector("link").textContent;
+                const pubDate = firstItem.querySelector("pubDate").textContent;
+                const description = firstItem.querySelector("description").textContent;
+
+                // Mostrar la última entrada en el HTML
+                document.getElementById("latest-post").innerHTML = `
+                    <h2>${title}</h2>
+                    <p><strong>Publicado el:</strong> ${new Date(pubDate).toLocaleDateString("es-ES")}</p>
+                    <p>${description}</p>
+                    <p><a href="${link}" target="_blank">Leer más</a></p>
+                `;
+            } catch (error) {
+                document.getElementById("latest-post").innerHTML = "<p>Error al cargar la última entrada.</p>";
+                console.error("Error obteniendo el feed RSS:", error);
+            }
+        }
+
+        // Ejecutar la función al cargar la página
+        getLatestPost();
+    </script>
+    
 <script src="https://platform.linkedin.com/badges/js/profile.js" async defer type="text/javascript"></script>
 <h2>Mi perfil en LinkedIn</h2>
     <div class="badge-base LI-profile-badge" data-locale="es_ES" data-size="medium" data-theme="dark" data-type="VERTICAL" data-vanity="dragonmoon1522" data-version="v1"><a class="badge-base__link LI-simple-link" href="https://ar.linkedin.com/in/dragonmoon1522?trk=profile-badge">Katherine Vargas</a></div>
