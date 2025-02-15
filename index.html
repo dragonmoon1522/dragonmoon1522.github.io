@@ -40,6 +40,16 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/showdown/2.1.0/showdown.min.js"></script>
 </head>
 <body>
+    <script>
+    if (window.self !== window.top) { // Si está en un iframe...
+        document.querySelectorAll("h1").forEach(h1 => h1.outerHTML = "<h2>" + h1.innerHTML + "</h2>");
+        document.querySelectorAll("h2").forEach(h2 => h2.outerHTML = "<h3>" + h2.innerHTML + "</h3>");
+        document.querySelectorAll("h3").forEach(h3 => h3.outerHTML = "<h4>" + h3.innerHTML + "</h4>");
+        document.querySelectorAll("h4").forEach(h4 => h4.outerHTML = "<h5>" + h4.innerHTML + "</h5>");
+        document.querySelectorAll("h5").forEach(h5 => h5.outerHTML = "<h6>" + h5.innerHTML + "</h6>");
+    }
+</script>
+
     <h1>KathWare Proyectos</h1>
 
     <h2>📢 Últimas Novedades</h2>
@@ -205,12 +215,12 @@
     </script>
 
 <script src="https://platform.linkedin.com/badges/js/profile.js" async defer type="text/javascript"></script>
-
+<h2>Mi perfil en LinkedIn</h2>
     <div class="badge-base LI-profile-badge" data-locale="es_ES" data-size="medium" data-theme="dark" data-type="VERTICAL" data-vanity="dragonmoon1522" data-version="v1"><a class="badge-base__link LI-simple-link" href="https://ar.linkedin.com/in/dragonmoon1522?trk=profile-badge">Katherine Vargas</a></div>
               
-    <h1>El contenido de KathWare está disponible bajo las siguientes licencias</h1>
+    <h2>El contenido de KathWare está disponible bajo las siguientes licencias</h2>
     <a href="https://kathware.com.ar/normas-de-uso-y-licencias-de-kathware/">Normas de uso y licencias de KathWare</a>
-        <h1>Si querés contribuir al crecimiento del blog y al desarrollo de app accesibles</h1>
+        <h3>Si querés contribuir al crecimiento del blog y al desarrollo de app accesibles</h3>
     Podés hacerlo <a href="https://paypal.me/kathware">a través de PayPal</a><br>
     Para más información, si venís de github, <a href="https://kathware.com.ar/">visitá KathWare</a>
 </body>
