@@ -236,7 +236,7 @@
             const latestEntry = data.items[0];
 
             document.getElementById("latest-post").innerHTML = `
-                <h2>${latestEntry.title}</h2>
+                <h2>Última entrada en KathWare: ${latestEntry.title}</h2>
                 <p><strong>Publicado el:</strong> ${new Date(latestEntry.pubDate).toLocaleDateString("es-ES")}</p>
                 <p>${latestEntry.description}</p>
                 <p><a href="${latestEntry.link}" target="_blank">Leer más</a></p>
