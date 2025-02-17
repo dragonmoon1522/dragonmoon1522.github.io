@@ -20,7 +20,12 @@ Una app accesible para organizar tus días, incluso cuando tenés 200 cosas en m
 
 - **🔗 Integraciones con IFTTT:**  
   Automatización inteligente para conectar apps y servicios.  
-  *Descubrí mis [applets publicados](https://ifttt.com/p/dragonmoon1522).*  
+  *Descubrí mis [applets publicados](https://ifttt.com/p/dragonmoon1522). Muy pronto post sobre esto.*  
+
+- **Una PWA con ChatGPT para convertir Markdown en cualquier formato**  
+Sin mucho código y con una interfaz sencilla y amigable, esta PWA con IA integrada viene a solucionar uno de los grandes problemas de las personas con discapacidad visual: el formateado de texto en documentos de todo tipo.  
+*Markdown es uno de los formatos más sencillos de aprender en cuanto al formateado de texto se refiere.*  
+*Nota: tenés que tener tu propia clave de OpenAI.*  
 
 ---
 
