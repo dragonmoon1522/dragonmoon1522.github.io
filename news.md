@@ -52,4 +52,4 @@ En KathWare encontrarás herramientas pensadas para facilitar tu experiencia:
 
 - **🔊 Lectura en voz alta:**  
   Escuchá cualquier entrada del blog con un botón dedicado *(disponible solo en español).*  
-- Leé las *nuevas [Normas de uso y licencias de KathWare](https://kathware.com.ar/normas-de-uso-y-licencias-de-kathware/)*    
+- Leé las *nuevas [Normas de uso y licencias de KathWare](https://kathware.com.ar/normas-de-uso-y-licencias-de-kathware/) y la _Política de Privacidad](https://kathware.com.ar/politica-de-privacidad/)*    
