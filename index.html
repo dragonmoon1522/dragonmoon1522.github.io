@@ -53,10 +53,11 @@ if (window.self !== window.top) {
 <h1>🚀 Proyectos activos en KathWare</h1>
 <div id="versiones">Cargando proyectos...</div>
 
-<script>
+  <script>
 async function obtenerRepositorios() {
   const usuarioGitHub = "dragonmoon1522";
   const apiRepos = `https://api.github.com/users/${usuarioGitHub}/repos`;
+
   try {
     const respuesta = await fetch(apiRepos);
     if (!respuesta.ok) throw new Error("No se pudo obtener la lista de repositorios.");
@@ -67,7 +68,7 @@ async function obtenerRepositorios() {
       const repoBaseURL = `https://raw.githubusercontent.com/${usuarioGitHub}/${repo.name}/main/`;
       const repoPageURL = `https://${usuarioGitHub}.github.io/${repo.name}/`;
 
-      const archivosRequeridos = ["readme.md", "version.md"];
+      const archivosRequeridos = ["readme.md", "README.md", "version.md", "VERSION.md"];
       let archivosEncontrados = new Set();
 
       const repoContentsURL = `https://api.github.com/repos/${usuarioGitHub}/${repo.name}/contents/`;
@@ -76,8 +77,9 @@ async function obtenerRepositorios() {
         if (repoContentsResp.ok) {
           const archivos = await repoContentsResp.json();
           archivos.forEach(archivo => {
-            if (archivosRequeridos.includes(archivo.name)) {
-              archivosEncontrados.add(archivo.name);
+            const nombreArchivo = archivo.name;
+            if (archivosRequeridos.includes(nombreArchivo)) {
+              archivosEncontrados.add(nombreArchivo.toLowerCase());
             }
           });
         }
@@ -86,10 +88,16 @@ async function obtenerRepositorios() {
         continue;
       }
 
-      if (!archivosEncontrados.has("readme.md") || !archivosEncontrados.has("version.md")) {
+      const tieneReadme = archivosEncontrados.has("readme.md");
+      const tieneVersion = archivosEncontrados.has("version.md");
+
+      if (!tieneReadme || !tieneVersion) {
         console.log(`Ignorando ${repo.name} porque falta readme.md o version.md.`);
         continue;
       }
+
+      const readmeArchivo = archivosEncontrados.has("readme.md") ? "readme.md" : "README.md";
+      const versionArchivo = archivosEncontrados.has("version.md") ? "version.md" : "VERSION.md";
 
       let descripcion = "No hay descripción disponible.";
       let ultimaVersion = "Versión desconocida";
@@ -97,7 +105,7 @@ async function obtenerRepositorios() {
 
       // 🔹 Descripción desde readme.md
       try {
-        const readmeRespuesta = await fetch(repoBaseURL + "readme.md");
+        const readmeRespuesta = await fetch(repoBaseURL + readmeArchivo);
         if (readmeRespuesta.ok) {
           const textoReadme = await readmeRespuesta.text();
           const lineas = textoReadme.split("\n");
@@ -105,7 +113,7 @@ async function obtenerRepositorios() {
           let capturando = false;
 
           for (let i = 0; i < lineas.length; i++) {
-            if (lineas[i].trim().includes("📌 **Descripción del Proyecto**")) {
+            if (lineas[i].includes("📌 **Descripción del Proyecto**")) {
               capturando = true;
               continue;
             }
@@ -120,12 +128,12 @@ async function obtenerRepositorios() {
           }
         }
       } catch (error) {
-        console.log(`Error obteniendo README.md en ${repo.name}:`, error);
+        console.log(`Error obteniendo ${readmeArchivo} en ${repo.name}:`, error);
       }
 
       // 🔹 Última versión desde version.md
       try {
-        const versionRespuesta = await fetch(repoBaseURL + "version.md");
+        const versionRespuesta = await fetch(repoBaseURL + versionArchivo);
         if (versionRespuesta.ok) {
           const textoVersion = await versionRespuesta.text();
           const lineasVersion = textoVersion.split("\n");
@@ -141,9 +149,7 @@ async function obtenerRepositorios() {
               continue;
             }
             if (capturando) {
-              if (lineasVersion[i].trim() === "---" || lineasVersion[i].startsWith("## ")) {
-                break;
-              }
+              if (lineasVersion[i].trim() === "---" || lineasVersion[i].startsWith("## ")) break;
               detalles.push(lineasVersion[i].trim());
             }
           }
@@ -152,7 +158,7 @@ async function obtenerRepositorios() {
           detallesVersion = detalles.length > 0 ? converter.makeHtml(detalles.join("\n")) : "Sin detalles disponibles.";
         }
       } catch (error) {
-        console.log(`No se encontró version.md en ${repo.name}`);
+        console.log(`No se encontró ${versionArchivo} en ${repo.name}`);
         detallesVersion = "No disponible.";
       }
 
@@ -200,7 +206,7 @@ obtenerRepositorios();
 <h2>El contenido de KathWare está disponible bajo las siguientes licencias</h2>
 <p><a href="https://kathware.com.ar/normas-de-uso-y-licencias-de-kathware/">Normas de uso y licencias de KathWare</a></p>
 <p><a href="https://kathware.com.ar/politica-de-privacidad/">Política de privacidad</a></p>
-
+<p><a href="https://kathware.com.ar/lau/">Licencia de Accesibilidad Universal</a></p>
 <h3>Si querés contribuir al crecimiento del blog y al desarrollo de apps accesibles</h3>
 <p>Podés hacerlo <a href="https://paypal.me/kathware">a través de PayPal</a></p>
 <p>Para más información, <a href="https://kathware.com.ar/">visitá KathWare</a></p>
