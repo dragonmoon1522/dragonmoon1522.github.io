@@ -26,7 +26,7 @@
       border-radius: 6px;
     }
 
-    .proyecto h3, .proyecto h2 {
+    .proyecto h3 {
       margin-top: 0;
     }
 
@@ -47,6 +47,12 @@
       font-size: 0.95rem;
       color: #444;
     }
+
+    .enlace-blog {
+      text-align: center;
+      margin-bottom: 2rem;
+      font-size: 1rem;
+    }
   </style>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/showdown/2.1.0/showdown.min.js"></script>
@@ -55,46 +61,14 @@
 
   <h1>🚀 Portafolio de Proyectos KathWare</h1>
 
-  <h2>📝 Proyectos publicados en el blog</h2>
-  <div id="kathware-posts">Cargando proyectos desde el blog...</div>
+  <p class="enlace-blog">
+    Para ver los proyectos documentados en el blog, visitá:<br>
+    📚 <a href="https://kathware.com.ar/proyectos/" target="_blank">kathware.com.ar/proyectos/</a>
+  </p>
 
   <h2>💻 Proyectos activos en GitHub</h2>
   <div id="versiones">Cargando proyectos desde GitHub...</div>
 
-  <!-- 🔹 Cargar proyectos desde el RSS del blog -->
-  <script>
-    const rssURL = "https://kathware.com.ar/category/proyectos/feed/";
-
-    fetch(rssURL)
-      .then(response => response.text())
-      .then(str => new window.DOMParser().parseFromString(str, "text/xml"))
-      .then(data => {
-        const items = data.querySelectorAll("item");
-        const contenedor = document.getElementById("kathware-posts");
-        contenedor.innerHTML = "";
-
-        items.forEach(item => {
-          const titulo = item.querySelector("title").textContent;
-          const link = item.querySelector("link").textContent;
-          const descripcion = item.querySelector("description").textContent;
-
-          const div = document.createElement("div");
-          div.classList.add("proyecto");
-
-          div.innerHTML = `
-            <h3><a href="${link}" target="_blank" rel="noopener noreferrer">${titulo}</a></h3>
-            <p>${descripcion}</p>
-          `;
-
-          contenedor.appendChild(div);
-        });
-      })
-      .catch(() => {
-        document.getElementById("kathware-posts").innerText = "No se pudo cargar el contenido del blog.";
-      });
-  </script>
-
-  <!-- 🔹 Cargar proyectos desde GitHub -->
   <script>
     async function obtenerRepositorios() {
       const usuarioGitHub = "dragonmoon1522";
@@ -188,7 +162,7 @@
                 }
               }
 
-              const converter = new showdown.Converter();
+              const converter = new showdown.Converter({ headerLevelStart: 4 });
               detallesVersion = detalles.length > 0 ? converter.makeHtml(detalles.join("\n")) : "Sin detalles disponibles.";
             }
           } catch {}
@@ -226,14 +200,15 @@
 
     obtenerRepositorios();
   </script>
-<hr>
-<footer style="text-align: center; margin-top: 2rem; font-size: 0.95rem;">
-  <p>🔗 <a href="https://kathware.com.ar/contacto/" target="_blank" rel="noopener noreferrer">Contacto directo</a> | 
-     <a href="https://kathware.com.ar/normas-de-uso-y-licencias-de-kathware/" target="_blank">Normas de uso</a> | 
-     <a href="https://kathware.com.ar/lau/" target="_blank">Licencia de Accesibilidad Universal</a>
-  </p>
-  <p>© 2025 <strong>KathWare</strong> — hecho por Katherine Vargas</p>
-</footer>
+
+  <hr>
+  <footer style="text-align: center; margin-top: 2rem; font-size: 0.95rem;">
+    <p>🔗 <a href="https://kathware.com.ar/contacto/" target="_blank">Contacto directo</a> | 
+       <a href="https://kathware.com.ar/normas-de-uso-y-licencias-de-kathware/" target="_blank">Normas de uso</a> | 
+       <a href="https://kathware.com.ar/lau/" target="_blank">Licencia de Accesibilidad Universal</a>
+    </p>
+    <p>© 2025 <strong>KathWare</strong> — hecho con 💙 por Katherine Vargas</p>
+  </footer>
 
 </body>
 </html>
