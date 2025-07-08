@@ -3,213 +3,237 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>KathWare Proyectos</title>
+  <title>Proyectos KathWare</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      max-width: 800px;
+      max-width: 900px;
       margin: auto;
-      padding: 20px;
+      padding: 2rem;
+      background-color: #fff;
+      color: #111;
     }
-    h1 {
+
+    h1, h2 {
       text-align: center;
     }
+
     .proyecto {
-      border: 1px solid #ddd;
-      padding: 15px;
-      margin-bottom: 20px;
-      border-radius: 5px;
-      background-color: #f9f9f9;
+      background-color: #f0f4f8;
+      border-left: 5px solid #007bff;
+      padding: 1rem;
+      margin-bottom: 1.5rem;
+      border-radius: 6px;
     }
-    .proyecto h2 {
+
+    .proyecto h3, .proyecto h2 {
       margin-top: 0;
     }
-    .btn {
-      display: inline-block;
-      padding: 8px 12px;
-      margin-top: 10px;
-      color: white;
-      background-color: #007bff;
-      text-decoration: none;
-      border-radius: 5px;
+
+    .proyecto p {
+      margin-bottom: 0.5rem;
     }
-    .btn:hover {
-      background-color: #0056b3;
+
+    a {
+      color: #007bff;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    .version-content {
+      font-size: 0.95rem;
+      color: #444;
     }
   </style>
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/showdown/2.1.0/showdown.min.js"></script>
 </head>
 <body>
-<script>
-if (window.self !== window.top) {
-  document.querySelectorAll("h1").forEach(h1 => h1.outerHTML = "<h2>" + h1.innerHTML + "</h2>");
-  document.querySelectorAll("h2").forEach(h2 => h2.outerHTML = "<h3>" + h2.innerHTML + "</h3>");
-  document.querySelectorAll("h3").forEach(h3 => h3.outerHTML = "<h4>" + h3.innerHTML + "</h4>");
-  document.querySelectorAll("h4").forEach(h4 => h4.outerHTML = "<h5>" + h4.innerHTML + "</h5>");
-  document.querySelectorAll("h5").forEach(h5 => h5.outerHTML = "<h6>" + h5.innerHTML + "</h6>");
-}
-</script>
 
-<h1>🚀 Proyectos activos en KathWare</h1>
-<div id="versiones">Cargando proyectos...</div>
+  <h1>🚀 Portafolio de Proyectos KathWare</h1>
 
+  <h2>📝 Proyectos publicados en el blog</h2>
+  <div id="kathware-posts">Cargando proyectos desde el blog...</div>
+
+  <h2>💻 Proyectos activos en GitHub</h2>
+  <div id="versiones">Cargando proyectos desde GitHub...</div>
+
+  <!-- 🔹 Cargar proyectos desde el RSS del blog -->
   <script>
-async function obtenerRepositorios() {
-  const usuarioGitHub = "dragonmoon1522";
-  const apiRepos = `https://api.github.com/users/${usuarioGitHub}/repos`;
+    const rssURL = "https://kathware.com.ar/category/proyectos/feed/";
 
-  try {
-    const respuesta = await fetch(apiRepos);
-    if (!respuesta.ok) throw new Error("No se pudo obtener la lista de repositorios.");
-    const repos = await respuesta.json();
-    const proyectosConVersion = [];
+    fetch(rssURL)
+      .then(response => response.text())
+      .then(str => new window.DOMParser().parseFromString(str, "text/xml"))
+      .then(data => {
+        const items = data.querySelectorAll("item");
+        const contenedor = document.getElementById("kathware-posts");
+        contenedor.innerHTML = "";
 
-    for (let repo of repos) {
-      const repoBaseURL = `https://raw.githubusercontent.com/${usuarioGitHub}/${repo.name}/main/`;
-      const repoPageURL = `https://${usuarioGitHub}.github.io/${repo.name}/`;
+        items.forEach(item => {
+          const titulo = item.querySelector("title").textContent;
+          const link = item.querySelector("link").textContent;
+          const descripcion = item.querySelector("description").textContent;
 
-      const archivosRequeridos = ["readme.md", "README.md", "version.md", "VERSION.md"];
-      let archivosEncontrados = new Set();
+          const div = document.createElement("div");
+          div.classList.add("proyecto");
 
-      const repoContentsURL = `https://api.github.com/repos/${usuarioGitHub}/${repo.name}/contents/`;
+          div.innerHTML = `
+            <h3><a href="${link}" target="_blank" rel="noopener noreferrer">${titulo}</a></h3>
+            <p>${descripcion}</p>
+          `;
+
+          contenedor.appendChild(div);
+        });
+      })
+      .catch(() => {
+        document.getElementById("kathware-posts").innerText = "No se pudo cargar el contenido del blog.";
+      });
+  </script>
+
+  <!-- 🔹 Cargar proyectos desde GitHub -->
+  <script>
+    async function obtenerRepositorios() {
+      const usuarioGitHub = "dragonmoon1522";
+      const apiRepos = `https://api.github.com/users/${usuarioGitHub}/repos`;
+
       try {
-        const repoContentsResp = await fetch(repoContentsURL);
-        if (repoContentsResp.ok) {
-          const archivos = await repoContentsResp.json();
-          archivos.forEach(archivo => {
-            const nombreArchivo = archivo.name;
-            if (archivosRequeridos.includes(nombreArchivo)) {
-              archivosEncontrados.add(nombreArchivo.toLowerCase());
+        const respuesta = await fetch(apiRepos);
+        if (!respuesta.ok) throw new Error("No se pudo obtener la lista de repositorios.");
+        const repos = await respuesta.json();
+        const proyectosConVersion = [];
+
+        for (let repo of repos) {
+          const repoBaseURL = `https://raw.githubusercontent.com/${usuarioGitHub}/${repo.name}/main/`;
+          const repoPageURL = `https://${usuarioGitHub}.github.io/${repo.name}/`;
+
+          const archivosRequeridos = ["readme.md", "README.md", "version.md", "VERSION.md"];
+          let archivosEncontrados = new Set();
+
+          const repoContentsURL = `https://api.github.com/repos/${usuarioGitHub}/${repo.name}/contents/`;
+          try {
+            const repoContentsResp = await fetch(repoContentsURL);
+            if (repoContentsResp.ok) {
+              const archivos = await repoContentsResp.json();
+              archivos.forEach(archivo => {
+                const nombreArchivo = archivo.name;
+                if (archivosRequeridos.includes(nombreArchivo)) {
+                  archivosEncontrados.add(nombreArchivo.toLowerCase());
+                }
+              });
             }
+          } catch {
+            continue;
+          }
+
+          const tieneReadme = archivosEncontrados.has("readme.md");
+          const tieneVersion = archivosEncontrados.has("version.md");
+
+          if (!tieneReadme || !tieneVersion) continue;
+
+          const readmeArchivo = archivosEncontrados.has("readme.md") ? "readme.md" : "README.md";
+          const versionArchivo = archivosEncontrados.has("version.md") ? "version.md" : "VERSION.md";
+
+          let descripcion = "No hay descripción disponible.";
+          let ultimaVersion = "Versión desconocida";
+          let detallesVersion = "Sin detalles disponibles.";
+
+          try {
+            const readmeRespuesta = await fetch(repoBaseURL + readmeArchivo);
+            if (readmeRespuesta.ok) {
+              const textoReadme = await readmeRespuesta.text();
+              const lineas = textoReadme.split("\n");
+              let descripcionArray = [];
+              let capturando = false;
+
+              for (let i = 0; i < lineas.length; i++) {
+                if (lineas[i].includes("📌 **Descripción del Proyecto**")) {
+                  capturando = true;
+                  continue;
+                }
+                if (capturando) {
+                  if (lineas[i].trim() === "---") break;
+                  let lineaLimpia = lineas[i].replace(/[#*]/g, "").trim();
+                  if (lineaLimpia) descripcionArray.push(lineaLimpia);
+                }
+              }
+              if (descripcionArray.length > 0) {
+                descripcion = descripcionArray.join(" ");
+              }
+            }
+          } catch {}
+
+          try {
+            const versionRespuesta = await fetch(repoBaseURL + versionArchivo);
+            if (versionRespuesta.ok) {
+              const textoVersion = await versionRespuesta.text();
+              const lineasVersion = textoVersion.split("\n");
+
+              let detalles = [];
+              let capturando = false;
+
+              for (let i = 0; i < lineasVersion.length; i++) {
+                let match = lineasVersion[i].match(/(\d+\.\d+\.\d+)/);
+                if (match) {
+                  ultimaVersion = match[0];
+                  capturando = true;
+                  continue;
+                }
+                if (capturando) {
+                  if (lineasVersion[i].trim() === "---" || lineasVersion[i].startsWith("## ")) break;
+                  detalles.push(lineasVersion[i].trim());
+                }
+              }
+
+              const converter = new showdown.Converter();
+              detallesVersion = detalles.length > 0 ? converter.makeHtml(detalles.join("\n")) : "Sin detalles disponibles.";
+            }
+          } catch {}
+
+          proyectosConVersion.push({
+            nombre: repo.name.replace(/-/g, " "),
+            url: repoPageURL,
+            descripcion: descripcion,
+            ultimaVersion: ultimaVersion,
+            detallesVersion: detallesVersion
           });
         }
+
+        cargarProyectos(proyectosConVersion);
       } catch (error) {
-        console.log(`No se pudieron obtener archivos en ${repo.name}`);
-        continue;
+        document.getElementById("versiones").innerText = "No se pudo cargar la lista de proyectos.";
       }
+    }
 
-      const tieneReadme = archivosEncontrados.has("readme.md");
-      const tieneVersion = archivosEncontrados.has("version.md");
+    function cargarProyectos(proyectos) {
+      const contenedor = document.getElementById("versiones");
+      proyectos.forEach(proyecto => {
+        const seccion = document.createElement("div");
+        seccion.classList.add("proyecto");
 
-      if (!tieneReadme || !tieneVersion) {
-        console.log(`Ignorando ${repo.name} porque falta readme.md o version.md.`);
-        continue;
-      }
-
-      const readmeArchivo = archivosEncontrados.has("readme.md") ? "readme.md" : "README.md";
-      const versionArchivo = archivosEncontrados.has("version.md") ? "version.md" : "VERSION.md";
-
-      let descripcion = "No hay descripción disponible.";
-      let ultimaVersion = "Versión desconocida";
-      let detallesVersion = "Sin detalles disponibles.";
-
-      // 🔹 Descripción desde readme.md
-      try {
-        const readmeRespuesta = await fetch(repoBaseURL + readmeArchivo);
-        if (readmeRespuesta.ok) {
-          const textoReadme = await readmeRespuesta.text();
-          const lineas = textoReadme.split("\n");
-          let descripcionArray = [];
-          let capturando = false;
-
-          for (let i = 0; i < lineas.length; i++) {
-            if (lineas[i].includes("📌 **Descripción del Proyecto**")) {
-              capturando = true;
-              continue;
-            }
-            if (capturando) {
-              if (lineas[i].trim() === "---") break;
-              let lineaLimpia = lineas[i].replace(/[#*]/g, "").trim();
-              if (lineaLimpia) descripcionArray.push(lineaLimpia);
-            }
-          }
-          if (descripcionArray.length > 0) {
-            descripcion = descripcionArray.join(" ");
-          }
-        }
-      } catch (error) {
-        console.log(`Error obteniendo ${readmeArchivo} en ${repo.name}:`, error);
-      }
-
-      // 🔹 Última versión desde version.md
-      try {
-        const versionRespuesta = await fetch(repoBaseURL + versionArchivo);
-        if (versionRespuesta.ok) {
-          const textoVersion = await versionRespuesta.text();
-          const lineasVersion = textoVersion.split("\n");
-
-          let detalles = [];
-          let capturando = false;
-
-          for (let i = 0; i < lineasVersion.length; i++) {
-            let match = lineasVersion[i].match(/(\d+\.\d+\.\d+)/);
-            if (match) {
-              ultimaVersion = match[0];
-              capturando = true;
-              continue;
-            }
-            if (capturando) {
-              if (lineasVersion[i].trim() === "---" || lineasVersion[i].startsWith("## ")) break;
-              detalles.push(lineasVersion[i].trim());
-            }
-          }
-
-          const converter = new showdown.Converter();
-          detallesVersion = detalles.length > 0 ? converter.makeHtml(detalles.join("\n")) : "Sin detalles disponibles.";
-        }
-      } catch (error) {
-        console.log(`No se encontró ${versionArchivo} en ${repo.name}`);
-        detallesVersion = "No disponible.";
-      }
-
-      proyectosConVersion.push({
-        nombre: repo.name.replace(/-/g, " "),
-        url: repoPageURL,
-        descripcion: descripcion,
-        ultimaVersion: ultimaVersion,
-        detallesVersion: detallesVersion
+        seccion.innerHTML = `
+          <h3><a href="${proyecto.url}" target="_blank">${proyecto.nombre}</a></h3>
+          <p><strong>Descripción:</strong> ${proyecto.descripcion}</p>
+          <p><strong>Última versión:</strong> ${proyecto.ultimaVersion}</p>
+          <div class="version-content">${proyecto.detallesVersion}</div>
+        `;
+        contenedor.appendChild(seccion);
       });
     }
 
-    cargarProyectos(proyectosConVersion);
-  } catch (error) {
-    console.error("Error al obtener los repositorios:", error);
-  }
-}
-
-function cargarProyectos(proyectos) {
-  const contenedor = document.getElementById("versiones");
-  proyectos.forEach(proyecto => {
-    const seccion = document.createElement("div");
-    seccion.classList.add("proyecto");
-
-    seccion.innerHTML = `
-      <h2>${proyecto.nombre}</h2>
-      <p>${proyecto.descripcion}</p>
-      <h3>Última versión: ${proyecto.ultimaVersion}</h3>
-      <div class="version-content">${proyecto.detallesVersion}</div>
-    `;
-    contenedor.appendChild(seccion);
-  });
-}
-
-obtenerRepositorios();
-</script>
-
-<script src="https://platform.linkedin.com/badges/js/profile.js" async defer type="text/javascript"></script>
-
-<h2>Mi perfil en LinkedIn</h2>
-<div class="badge-base LI-profile-badge" data-locale="es_ES" data-size="medium" data-theme="dark" data-type="VERTICAL" data-vanity="dragonmoon1522" data-version="v1">
-  <a class="badge-base__link LI-simple-link" href="https://ar.linkedin.com/in/dragonmoon1522?trk=profile-badge">Katherine Vargas</a>
-</div>
-
-<h2>El contenido de KathWare está disponible bajo las siguientes licencias</h2>
-<p><a href="https://kathware.com.ar/normas-de-uso-y-licencias-de-kathware/">Normas de uso y licencias de KathWare</a></p>
-<p><a href="https://kathware.com.ar/politica-de-privacidad/">Política de privacidad</a></p>
-<p><a href="https://kathware.com.ar/lau/">Licencia de Accesibilidad Universal</a></p>
-<h3>Si querés contribuir al crecimiento del blog y al desarrollo de apps accesibles</h3>
-<p>Podés hacerlo <a href="https://paypal.me/kathware">a través de PayPal</a></p>
-<p>Para más información, <a href="https://kathware.com.ar/">visitá KathWare</a></p>
+    obtenerRepositorios();
+  </script>
+<hr>
+<footer style="text-align: center; margin-top: 2rem; font-size: 0.95rem;">
+  <p>🔗 <a href="https://kathware.com.ar/contacto/" target="_blank" rel="noopener noreferrer">Contacto directo</a> | 
+     <a href="https://kathware.com.ar/normas-de-uso-y-licencias-de-kathware/" target="_blank">Normas de uso</a> | 
+     <a href="https://kathware.com.ar/lau/" target="_blank">Licencia de Accesibilidad Universal</a>
+  </p>
+  <p>© 2025 <strong>KathWare</strong> — hecho por Katherine Vargas</p>
+</footer>
 
 </body>
 </html>
