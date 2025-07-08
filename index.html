@@ -59,14 +59,12 @@
 </head>
 <body>
 
-  <h1>🚀 Portafolio de Proyectos KathWare</h1>
-
-  <p class="enlace-blog">
+    <p class="enlace-blog">
     Para ver los proyectos documentados en el blog, visitá:<br>
-    📚 <a href="https://kathware.com.ar/proyectos/" target="_blank">kathware.com.ar/proyectos/</a>
+    <a href="https://kathware.com.ar/proyectos/" target="_blank">La página de proyectos de KathWare</a>
   </p>
 
-  <h2>💻 Proyectos activos en GitHub</h2>
+  <h2>Proyectos activos en GitHub</h2>
   <div id="versiones">Cargando proyectos desde GitHub...</div>
 
   <script>
@@ -124,7 +122,7 @@
               let capturando = false;
 
               for (let i = 0; i < lineas.length; i++) {
-                if (lineas[i].includes("📌 **Descripción del Proyecto**")) {
+                if (lineas[i].includes("**Descripción del Proyecto**")) {
                   capturando = true;
                   continue;
                 }
@@ -190,8 +188,8 @@
 
         seccion.innerHTML = `
           <h3><a href="${proyecto.url}" target="_blank">${proyecto.nombre}</a></h3>
-          <p><strong>Descripción:</strong> ${proyecto.descripcion}</p>
-          <p><strong>Última versión:</strong> ${proyecto.ultimaVersion}</p>
+          <h4><strong>Descripción:</strong></h4> ${proyecto.descripcion}</p>
+          <h4><strong>Última versión:</strong></h4> ${proyecto.ultimaVersion}</p>
           <div class="version-content">${proyecto.detallesVersion}</div>
         `;
         contenedor.appendChild(seccion);
@@ -203,11 +201,11 @@
 
   <hr>
   <footer style="text-align: center; margin-top: 2rem; font-size: 0.95rem;">
-    <p>🔗 <a href="https://kathware.com.ar/contacto/" target="_blank">Contacto directo</a> | 
+    <p><a href="https://kathware.com.ar/contacto/" target="_blank">Contacto directo</a> | 
        <a href="https://kathware.com.ar/normas-de-uso-y-licencias-de-kathware/" target="_blank">Normas de uso</a> | 
        <a href="https://kathware.com.ar/lau/" target="_blank">Licencia de Accesibilidad Universal</a>
     </p>
-    <p>© 2025 <strong>KathWare</strong> — hecho con 💙 por Katherine Vargas</p>
+    <p>© 2025 <strong>KathWare</strong> — hecho por Katherine Vargas</p>
   </footer>
 
 </body>
