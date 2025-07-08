@@ -1,14 +1,14 @@
-## KathWare GitHub Pages — Núcleo del ecosistema Dragonmoon1522
+##KathWare GitHub Pages — Núcleo del ecosistema Dragonmoon1522
 
-📌 **Autora:** Katherine Vargas | [(KathWare)](https://kathware.com.ar)  
-📅 **Última actualización:** 2025-07-04  
+**Autora:** Katherine Vargas | [(KathWare)](https://kathware.com.ar)  
+**Última actualización:** 2025-07-08  
 
 ---
 
-### 📌 **Descripción del Proyecto**
+###**Descripción del Proyecto**
 
 Este repositorio funciona como el **núcleo público del ecosistema KathWare**, y actúa como sitio GitHub Pages en:  
-🔗 [https://dragonmoon1522.github.io](https://dragonmoon1522.github.io)
+[https://dragonmoon1522.github.io](https://dragonmoon1522.github.io)
 
 Incluye:
 
@@ -17,45 +17,45 @@ Incluye:
 - Extracción dinámica de descripciones desde `README.md` y versiones desde `version.md`.
 - Integración con LinkedIn y enlaces a políticas, normas de uso y medios de contribución.
 
-### 🛠️ Tecnologías utilizadas
+###Tecnologías utilizadas
 
 - HTML, CSS y JavaScript puro.
 - API pública de GitHub.
-- Librería **Showdown.js** para conversión Markdown → HTML.
+- Librería **Showdown.js** para conversión Markdown a HTML.
 
 ---
 
-### 📚 **Licencias y manifiestos**
+### **Licencias y manifiestos**
 
-- 🛡️ [Licencia de Accesibilidad Universal (LAU) — Español](./licenses/lau/lau-v1.1-es.md)  
-- 🌍 [Universal Accessibility License (LAU) — English](./licenses/lau/lau-v1.1-en.md)  
-- 📜 [Manifiesto de la LAU](./licenses/lau/manifesto.md)  
+- 🛡[Licencia de Accesibilidad Universal (LAU) — Español](./licenses/lau/lau-v1.1-es.md)  
+- [Universal Accessibility License (LAU) — English](./licenses/lau/lau-v1.1-en.md)  
+- [Manifiesto de la LAU](./licenses/lau/manifesto.md)  
 
 > Todos los proyectos del ecosistema KathWare están protegidos por la LAU.
 
 ---
 
-### 🧩 **Proyectos activos**
+### **Proyectos activos**
 
 Los proyectos se muestran automáticamente desde este mismo repositorio en tiempo real:  
-🔗 [Ver proyectos en el sitio](https://dragonmoon1522.github.io)
+[Ver proyectos en el sitio](https://dragonmoon1522.github.io)
 
 ---
 
-### 📜 **Historial de versiones del núcleo**
+### **Historial de versiones del núcleo**
 
-🔗 [📖 Consultar `version.md`](./version.md)
+[📖 Consultar `version.md`](./version.md)
 
 ---
 
-### ☕ Cómo contribuir
+### Cómo contribuir
 
 Si deseas mejorar este proyecto, puedes hacer un **pull request** o reportar problemas en la sección de **Issues**.  
 También podés apoyar el proyecto a través de donaciones o difusión.
 
 ---
 
-### 🧾 Licencia de este sitio
+### Licencia de este sitio
 
 Este contenido está licenciado bajo **Creative Commons BY-NC-SA 4.0**.  
 Más información en: [Normas de uso y licencias de KathWare](https://kathware.com.ar/normas-de-uso-y-licencias-de-kathware/)
