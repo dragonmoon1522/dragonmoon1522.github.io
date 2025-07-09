@@ -17,7 +17,7 @@ Incluye:
 - Extracción dinámica de descripciones desde `README.md` y versiones desde `version.md`.
 - Integración con LinkedIn y enlaces a políticas, normas de uso y medios de contribución.
 
-### Tecnologías utilizadas
+### **Tecnologías utilizadas**
 
 - HTML, CSS y JavaScript puro.
 - API pública de GitHub.
@@ -48,14 +48,14 @@ Los proyectos se muestran automáticamente desde este mismo repositorio en tiemp
 
 ---
 
-### Cómo contribuir
+### **Cómo contribuir**
 
 Si deseas mejorar este proyecto, puedes hacer un **pull request** o reportar problemas en la sección de **Issues**.  
 También podés apoyar el proyecto a través de donaciones o difusión.
 
 ---
 
-### Licencia de este sitio
+### **Licencia de este sitio**
 
 Este contenido está licenciado bajo **Creative Commons BY-NC-SA 4.0**.  
 Más información en: [Normas de uso y licencias de KathWare](https://kathware.com.ar/normas-de-uso-y-licencias-de-kathware/)
