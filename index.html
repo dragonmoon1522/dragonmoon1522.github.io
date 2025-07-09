@@ -76,7 +76,7 @@
   <script>
     async function obtenerRepositorios() {
       const usuarioGitHub = "dragonmoon1522";
-      const repoPrincipal = "dragonmoon1522.github.io";
+      const repoPrincipal = "kathware";
       const apiRepos = `https://api.github.com/users/${usuarioGitHub}/repos`;
 
       try {
@@ -131,12 +131,14 @@
 
                 for (let i = 0; i < lineas.length; i++) {
                   const linea = lineas[i];
-                  if (linea.toLowerCase().includes("descripción del proyecto")) {
+
+                  if (linea.match(/^#{2,4}.*Descripción del Proyecto/i)) {
                     capturando = true;
                     continue;
                   }
+
                   if (capturando) {
-                    if (linea.trim().startsWith("###")) break;
+                    if (linea.trim().startsWith("###") || linea.trim().startsWith("##")) break;
                     let limpia = linea.replace(/[#*]/g, "").trim();
                     if (limpia) descripcionArray.push(limpia);
                   }
@@ -178,7 +180,6 @@
             } catch {}
           }
 
-          // Excluir mostrar el version.md completo si es el repo principal
           if (repo.name === repoPrincipal) {
             proyectosConVersion.unshift({
               nombre: "KathWare — Núcleo del ecosistema",
