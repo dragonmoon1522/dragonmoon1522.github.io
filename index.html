@@ -136,7 +136,7 @@
                     continue;
                   }
                   if (capturando) {
-                    if (linea.trim().startsWith("###") || linea.trim() === "---") break;
+                    if (linea.trim().startsWith("###")) break;
                     let limpia = linea.replace(/[#*]/g, "").trim();
                     if (limpia) descripcionArray.push(limpia);
                   }
