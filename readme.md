@@ -5,7 +5,7 @@
 
 ---
 
-###**Descripción del Proyecto**
+### **Descripción del Proyecto**
 
 Este repositorio funciona como el **núcleo público del ecosistema KathWare**, y actúa como sitio GitHub Pages en:  
 [https://dragonmoon1522.github.io](https://dragonmoon1522.github.io)
