@@ -17,6 +17,8 @@ Incluye:
 - Extracción dinámica de descripciones desde `README.md` y versiones desde `version.md`.
 - Integración con LinkedIn y enlaces a políticas, normas de uso y medios de contribución.
 
+---
+
 ### **Tecnologías utilizadas**
 
 - HTML, CSS y JavaScript puro.
