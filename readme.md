@@ -1,4 +1,4 @@
-##KathWare GitHub Pages — Núcleo del ecosistema Dragonmoon1522
+## KathWare GitHub Pages — Núcleo del ecosistema Dragonmoon1522
 
 **Autora:** Katherine Vargas | [(KathWare)](https://kathware.com.ar)  
 **Última actualización:** 2025-07-08  
@@ -17,7 +17,7 @@ Incluye:
 - Extracción dinámica de descripciones desde `README.md` y versiones desde `version.md`.
 - Integración con LinkedIn y enlaces a políticas, normas de uso y medios de contribución.
 
-###Tecnologías utilizadas
+### Tecnologías utilizadas
 
 - HTML, CSS y JavaScript puro.
 - API pública de GitHub.
@@ -27,7 +27,7 @@ Incluye:
 
 ### **Licencias y manifiestos**
 
-- 🛡[Licencia de Accesibilidad Universal (LAU) — Español](./licenses/lau/lau-v1.1-es.md)  
+- [Licencia de Accesibilidad Universal (LAU) — Español](./licenses/lau/lau-v1.1-es.md)  
 - [Universal Accessibility License (LAU) — English](./licenses/lau/lau-v1.1-en.md)  
 - [Manifiesto de la LAU](./licenses/lau/manifesto.md)  
 
@@ -44,7 +44,7 @@ Los proyectos se muestran automáticamente desde este mismo repositorio en tiemp
 
 ### **Historial de versiones del núcleo**
 
-[📖 Consultar `version.md`](./version.md)
+[Consultar `version.md`](./version.md)
 
 ---
 
