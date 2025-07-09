@@ -1,4 +1,4 @@
-## KathWare GitHub Pages
+## **KathWare GitHub Pages**
 
 **Autora:** Katherine Vargas | [(KathWare)](https://kathware.com.ar)  
 **Última actualización:** 2025-07-08  
