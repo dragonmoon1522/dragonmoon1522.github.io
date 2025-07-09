@@ -15,7 +15,7 @@ Incluye:
 - La **Licencia de Accesibilidad Universal (LAU)** como base ética y legal para todos los proyectos del ecosistema.
 - Un sistema automatizado que muestra los proyectos activos en GitHub, siempre que tengan `README.md` y `version.md`.
 - Extracción dinámica de descripciones desde `README.md` y versiones desde `version.md`.
-- Integración con LinkedIn y enlaces a políticas, normas de uso y medios de contribución.
+- Integración con LinkedIn y enlaces a políticas, normas de uso y medios de contribución.  
 
 ---
 
