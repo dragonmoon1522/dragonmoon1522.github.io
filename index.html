@@ -72,119 +72,120 @@
   <div id="versiones">Cargando proyectos desde GitHub...</div>
 
   <script>
-  async function obtenerRepositorios() {
-    const usuarioGitHub = "dragonmoon1522";
-    const repoPrincipal = "kathware";
-    const apiRepos = `https://api.github.com/users/${usuarioGitHub}/repos`;
-    const converter = new showdown.Converter({ flavor: 'github', headerLevelStart: 3 });
+    async function obtenerRepositorios() {
+      const usuarioGitHub = "dragonmoon1522";
+      const repoPrincipal = "kathware";
+      const apiRepos = `https://api.github.com/users/${usuarioGitHub}/repos`;
+      const converter = new showdown.Converter({ headerLevelStart: 3 });
 
-    try {
-      const respuesta = await fetch(apiRepos);
-      if (!respuesta.ok) throw new Error("No se pudo obtener la lista de repositorios.");
-      const repos = await respuesta.json();
-      const proyectos = [];
+      try {
+        const respuesta = await fetch(apiRepos);
+        const repos = await respuesta.json();
+        const proyectos = [];
 
-      for (let repo of repos) {
-        const baseURL = `https://raw.githubusercontent.com/${usuarioGitHub}/${repo.name}/main/`;
-        const pagina = `https://${usuarioGitHub}.github.io/${repo.name}/`;
+        for (let repo of repos) {
+          const baseURL = `https://raw.githubusercontent.com/${usuarioGitHub}/${repo.name}/main/`;
+          const pageURL = `https://${usuarioGitHub}.github.io/${repo.name}/`;
+          const archivos = ["README.md", "readme.md", "VERSION.md", "version.md", "LICENSE.md"];
+          let readmeText = "", versionText = "", licenseText = "", titulo = repo.name;
 
-        let readme = "", version = "", license = "", titulo = "", descripcion = "";
+          for (let archivo of archivos) {
+            try {
+              const res = await fetch(baseURL + archivo);
+              if (res.ok) {
+                const texto = await res.text();
+                if (archivo.toLowerCase().includes("readme")) readmeText = texto;
+                if (archivo.toLowerCase().includes("version")) versionText = texto;
+                if (archivo.toLowerCase().includes("license")) licenseText = texto;
+              }
+            } catch {}
+          }
 
-        // Traer README
-        try {
-          const resp = await fetch(baseURL + "README.md");
-          if (resp.ok) {
-            const texto = await resp.text();
-            readme = converter.makeHtml(texto);
-            // Extraer título real del proyecto
-            const tituloMatch = texto.match(/^#\s+(.*)/);
-            if (tituloMatch) titulo = tituloMatch[1].trim();
+          let readmeHtml = "", descripcion = "", version = "", licenseHtml = "";
 
-            // Extraer bloque de descripción
-            const descStart = texto.indexOf("### Descripción del Proyecto");
-            if (descStart !== -1) {
-              const subTexto = texto.slice(descStart);
-              const match = subTexto.match(/### Descripción del Proyecto\s+(.*?)\n###/s);
-              if (match && match[1]) {
-                descripcion = converter.makeHtml(match[1].trim());
+          if (readmeText) {
+            const lineas = readmeText.split("\n");
+            const encabezado = lineas.find(l => l.trim().startsWith("#"));
+            titulo = encabezado ? encabezado.replace(/^#+\s*/, "").trim() : titulo;
+
+            // Extraer descripción
+            let capturando = false;
+            let bloques = [];
+            for (let l of lineas) {
+              if (l.toLowerCase().includes("descripción del proyecto")) {
+                capturando = true;
+                continue;
+              }
+              if (capturando) {
+                if (l.trim().startsWith("###") || l.trim() === "---") break;
+                bloques.push(l);
+              }
+            }
+            descripcion = bloques.join("\n");
+            readmeHtml = converter.makeHtml(readmeText);
+          }
+
+          if (versionText) {
+            const lineas = versionText.split("\n");
+            for (let i = 0; i < lineas.length; i++) {
+              const match = lineas[i].match(/(\d+\.\d+\.\d+)/);
+              if (match) {
+                version = match[0];
+                break;
               }
             }
           }
-        } catch {}
 
-        // Traer VERSION
-        try {
-          const resp = await fetch(baseURL + "version.md");
-          if (resp.ok) {
-            const texto = await resp.text();
-            const secciones = texto.split(/##\s+/).filter(v => v.trim().length > 0);
-            if (secciones.length > 0) {
-              const primera = secciones[0].split("---")[0].trim();
-              version = converter.makeHtml("## Última versión\n\n" + primera);
-            }
+          if (repo.name === repoPrincipal) {
+            licenseHtml = licenseText ? converter.makeHtml(licenseText) : "";
+            proyectos.unshift({
+              titulo,
+              url: pageURL,
+              readme: readmeHtml,
+              version,
+              license: licenseHtml
+            });
+          } else {
+            proyectos.push({
+              titulo,
+              url: pageURL,
+              descripcion: descripcion ? converter.makeHtml(descripcion) : "",
+              version
+            });
           }
-        } catch {}
-
-        // Traer LICENSE (solo para el repo principal)
-        if (repo.name === repoPrincipal) {
-          try {
-            const resp = await fetch(baseURL + "license.md");
-            if (resp.ok) {
-              const texto = await resp.text();
-              license = converter.makeHtml(texto);
-            }
-          } catch {}
         }
 
-        // Decidir qué mostrar
-        if (repo.name === repoPrincipal) {
-          proyectos.unshift({
-            titulo: titulo || "KathWare — Núcleo del ecosistema",
-            url: pagina,
-            readme,
-            version,
-            license
-          });
-        } else {
-          proyectos.push({
-            titulo: titulo || repo.name.replace(/-/g, " "),
-            url: pagina,
-            descripcion,
-            version
-          });
-        }
+        cargarProyectos(proyectos);
+      } catch {
+        document.getElementById("versiones").innerText = "No se pudo cargar la lista de proyectos.";
       }
-
-      renderizarProyectos(proyectos);
-    } catch (error) {
-      document.getElementById("versiones").innerText = "Error al cargar proyectos.";
     }
-  }
 
-  function renderizarProyectos(proyectos) {
-    const contenedor = document.getElementById("versiones");
-    contenedor.innerHTML = "";
+    function cargarProyectos(proyectos) {
+      const contenedor = document.getElementById("versiones");
+      contenedor.innerHTML = "";
 
-    proyectos.forEach(proy => {
-      const div = document.createElement("div");
-      div.className = "proyecto";
+      proyectos.forEach(p => {
+        const div = document.createElement("div");
+        div.className = "proyecto";
 
-      div.innerHTML = `
-        <h3><a href="${proy.url}" target="_blank">${proy.titulo}</a></h3>
-        ${proy.readme ? `<div class="markdown">${proy.readme}</div>` : ""}
-        ${proy.descripcion ? `<div class="markdown">${proy.descripcion}</div>` : ""}
-        ${proy.version ? `<div class="markdown">${proy.version}</div>` : ""}
-        ${proy.license ? `<div class="markdown">${proy.license}</div>` : ""}
-      `;
+        let html = `<h3><a href="${p.url}" target="_blank">${p.titulo}</a></h3>`;
 
-      contenedor.appendChild(div);
-    });
-  }
+        if (p.readme) html += `<div class="markdown">${p.readme}</div>`;
+        else html += `<div class="markdown">${p.descripcion || "Descripción no disponible."}</div>`;
 
-  obtenerRepositorios();
-</script>
+        if (p.version) html += `<p><strong>Última versión:</strong> ${p.version}</p>`;
+        if (p.license) html += `<div class="markdown">${p.license}</div>`;
 
-<hr />
+        div.innerHTML = html;
+        contenedor.appendChild(div);
+      });
+    }
+
+    obtenerRepositorios();
+  </script>
+
+  <hr />
   <footer>
     <p>
       <a href="https://github.com/dragonmoon1522" target="_blank">Ver perfil en GitHub</a> |
