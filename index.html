@@ -77,6 +77,8 @@
       const repoPrincipal = "kathware";
       const apiRepos = `https://api.github.com/users/${usuarioGitHub}/repos`;
 
+      const converter = new showdown.Converter({ headerLevelStart: 3 });
+
       try {
         const respuesta = await fetch(apiRepos);
         if (!respuesta.ok) throw new Error("No se pudo obtener la lista de repositorios.");
@@ -84,33 +86,99 @@
         const proyectosConInfo = [];
 
         for (let repo of repos) {
-          const repoBaseURL = `https://raw.githubusercontent.com/${usuarioGitHub}/${repo.name}/main/`;
-          const repoPageURL = `https://${usuarioGitHub}.github.io/${repo.name}/`;
-          const archivos = ["README.md", "readme.md", "VERSION.md", "version.md"];
-          const converter = new showdown.Converter({ headerLevelStart: 3 });
+          const baseURL = `https://raw.githubusercontent.com/${usuarioGitHub}/${repo.name}/main/`;
+          const pageURL = `https://${usuarioGitHub}.github.io/${repo.name}/`;
 
-          let readmeHtml = "", versionHtml = "";
+          let readmeRaw = "", versionRaw = "", licenseRaw = "";
+          let readmeHTML = "", versionHTML = "", licenseHTML = "";
+          let tituloExtraido = null;
+          let descripcionReducida = "";
 
-          for (let archivo of archivos) {
+          const archivos = {
+            readme: ["README.md", "readme.md"],
+            version: ["VERSION.md", "version.md"],
+            license: ["LICENSE.md", "license.md"]
+          };
+
+          for (let nombre of archivos.readme) {
             try {
-              const respuestaArchivo = await fetch(repoBaseURL + archivo);
-              if (respuestaArchivo.ok) {
-                const texto = await respuestaArchivo.text();
-                if (archivo.toLowerCase().includes("readme")) {
-                  readmeHtml = converter.makeHtml(texto);
+              const res = await fetch(baseURL + nombre);
+              if (res.ok) {
+                readmeRaw = await res.text();
+                const lineas = readmeRaw.split("\n");
+                readmeHTML = converter.makeHtml(readmeRaw);
+
+                // Extraer título del primer ## 
+                const tituloMatch = readmeRaw.match(/^##\s+(.*)/m);
+                if (tituloMatch) tituloExtraido = tituloMatch[1].trim();
+
+                // Solo para proyectos que no sean el principal
+                if (repo.name !== repoPrincipal) {
+                  let descripcionLines = [];
+                  let inDescripcion = false;
+                  for (let l of lineas) {
+                    if (l.toLowerCase().includes("descripción del proyecto")) {
+                      inDescripcion = true;
+                      continue;
+                    }
+                    if (inDescripcion && l.startsWith("###")) break;
+                    if (inDescripcion) descripcionLines.push(l);
+                  }
+                  descripcionReducida = converter.makeHtml(descripcionLines.join("\n"));
                 }
-                if (archivo.toLowerCase().includes("version")) {
-                  versionHtml = converter.makeHtml(texto);
-                }
+                break;
               }
-            } catch (e) {}
+            } catch {}
+          }
+
+          for (let nombre of archivos.version) {
+            try {
+              const res = await fetch(baseURL + nombre);
+              if (res.ok) {
+                versionRaw = await res.text();
+                const lineas = versionRaw.split("\n");
+                let versionDetectada = null;
+                let detalles = [];
+
+                for (let i = 0; i < lineas.length; i++) {
+                  const match = lineas[i].match(/(\d+\.\d+(\.\d+)?)/);
+                  if (match && !versionDetectada) {
+                    versionDetectada = match[0];
+                    continue;
+                  }
+                  if (versionDetectada && lineas[i].trim() && !lineas[i].startsWith("---")) {
+                    detalles.push(lineas[i]);
+                  }
+                  if (lineas[i].startsWith("## ")) break;
+                }
+
+                versionHTML = `<h4>Última versión: ${versionDetectada}</h4>` + 
+                  (detalles.length > 0 ? converter.makeHtml(detalles.join("\n")) : "");
+                break;
+              }
+            } catch {}
+          }
+
+          if (repo.name === repoPrincipal) {
+            for (let nombre of archivos.license) {
+              try {
+                const res = await fetch(baseURL + nombre);
+                if (res.ok) {
+                  licenseRaw = await res.text();
+                  licenseHTML = converter.makeHtml(licenseRaw);
+                  break;
+                }
+              } catch {}
+            }
           }
 
           proyectosConInfo.push({
-            nombre: repo.name === repoPrincipal ? "KathWare — Núcleo del ecosistema" : repo.name.replace(/-/g, " "),
-            url: repoPageURL,
-            readme: readmeHtml,
-            version: versionHtml
+            nombre: repo.name,
+            titulo: tituloExtraido || repo.name.replace(/-/g, " "),
+            url: pageURL,
+            readme: repo.name === repoPrincipal ? readmeHTML : descripcionReducida,
+            version: versionHTML,
+            license: licenseHTML
           });
         }
 
@@ -124,14 +192,15 @@
       const contenedor = document.getElementById("versiones");
       contenedor.innerHTML = "";
 
-      proyectos.forEach(proyecto => {
+      proyectos.forEach(p => {
         const seccion = document.createElement("div");
         seccion.classList.add("proyecto");
 
         seccion.innerHTML = `
-          <h3><a href="${proyecto.url}" target="_blank">${proyecto.nombre}</a></h3>
-          ${proyecto.readme ? `<div class="markdown">${proyecto.readme}</div>` : ""}
-          ${proyecto.version ? `<div class="markdown">${proyecto.version}</div>` : ""}
+          <h3><a href="${p.url}" target="_blank">${p.titulo}</a></h3>
+          ${p.readme ? `<div class="markdown">${p.readme}</div>` : ""}
+          ${p.version ? `<div class="markdown">${p.version}<p><a href="${p.url}version.md" target="_blank">Ver historial completo</a></p></div>` : ""}
+          ${p.license ? `<div class="markdown">${p.license}</div>` : ""}
         `;
 
         contenedor.appendChild(seccion);
