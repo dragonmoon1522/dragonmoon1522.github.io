@@ -1,7 +1,18 @@
 ## Historial de Versiones GitHub Pages  
 
-**Última actualización:** 2025-07-03  
+**Última actualización:** 2026-10-27  
 ✍**Autor:** Katherine Vargas [(KathWare)](https://kathware.com.ar)  
+
+---
+
+### **Versión 1.3.0 — 2026-10-27**
+
+- Se actualiza el portal para mostrar el README completo y el historial de versiones de cada repositorio público como HTML.
+- Se leen los archivos desde la rama predeterminada, en lugar de suponer que todos usan main.
+- Se convierten los enlaces e imágenes relativos para que apunten al repositorio y rama correctos.
+- Se sanea el HTML derivado del Markdown antes de insertarlo en la página.
+- Se excluye el propio repositorio de GitHub Pages del catálogo y se indican los repositorios archivados.
+- Se actualizan la documentación y el historial para aclarar que cada proyecto declara su licencia por separado.
 
 ---
 
