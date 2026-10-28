@@ -1,7 +1,13 @@
 ## Historial de Versiones GitHub Pages  
 
-**Última actualización:** 2026-10-27  
+**Última actualización:** 2026-10-28  
 ✍**Autor:** Katherine Vargas [(KathWare)](https://kathware.com.ar)  
+
+---
+
+### **Versión 1.3.1 — 2026-10-28**
+
+- Se inicializan las librerías de Markdown después de cargarse, evitando que un error de orden impida mostrar el catálogo.
 
 ---
 
