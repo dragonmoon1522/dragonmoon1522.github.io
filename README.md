@@ -1,7 +1,7 @@
 ## KathWare GitHub Pages
 
 **Autora:** Katherine Vargas | [KathWare](https://kathware.com.ar)  
-**Última actualización:** 2026-10-27
+**Última actualización:** 2026-10-28
 
 ---
 
@@ -27,6 +27,7 @@ El contenido Markdown se sanea antes de insertarlo en la página. Los repositori
 - API pública de GitHub.
 - Showdown para convertir Markdown a HTML.
 - DOMPurify para sanear el HTML generado.
+- Inicialización de estas librerías antes de renderizar las fichas.
 
 ### Licencias
 
