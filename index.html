@@ -58,8 +58,28 @@
       font-size: 0.95rem;
       color: #333;
     }
+  
+    .proyecto { color:#111; }
+    .proyecto-header { display:flex; flex-wrap:wrap; align-items:baseline; gap:.5rem; }
+    .project-version { font-weight:700; margin:.65rem 0; }
+    .project-status { border:1px solid #555; border-radius:999px; padding:.1rem .55rem; font-size:.9rem; }
+    .project-status.archived { background:#e9e9e9; }
+    .project-details { margin-top:.75rem; border:1px solid #777; border-radius:6px; padding:.5rem .75rem; background:#fff; }
+    .project-details summary { cursor:pointer; font-weight:700; padding:.35rem 0; }
+    .markdown h1,.markdown h2,.markdown h3,.markdown h4 { text-align:left; }
+    .markdown pre,.markdown table { max-width:100%; overflow:auto; }
+    .markdown pre { white-space:pre-wrap; overflow-wrap:anywhere; background:#f5f5f5; padding:.75rem; }
+    .markdown code { overflow-wrap:anywhere; }
+    .markdown table { display:block; border-collapse:collapse; }
+    .markdown th,.markdown td { border:1px solid #777; padding:.4rem; text-align:left; }
+    .markdown img { max-width:100%; height:auto; }
+    .markdown a { overflow-wrap:anywhere; }
+    .markdown blockquote { margin-left:.75rem; padding-left:.75rem; border-left:3px solid #777; }
+    .mensaje-error { color:#111; background:#fff4d1; border:2px solid #7a5600; padding:1rem; }
+
   </style>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/showdown/2.1.0/showdown.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/showdown/2.1.0/showdown.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/dompurify@3.4.17/dist/purify.min.js" defer></script>
 </head>
 <body>
 
@@ -68,121 +88,215 @@
     <a href="https://kathware.com.ar/proyectos/" target="_blank">Proyectos en el blog de KathWare</a>
   </p>
 
-  <h2>Proyectos activos en GitHub</h2>
-  <div id="versiones">Cargando proyectos desde GitHub...</div>
+  <h1>Proyectos de KathWare en GitHub</h1>
+  <h2>Repositorios públicos</h2>
+  <div id="versiones" role="status" aria-live="polite">Cargando proyectos desde GitHub...</div>
 
   <script>
-    async function obtenerRepositorios() {
-      const usuarioGitHub = "dragonmoon1522";
-      const repoPrincipal = "kathware";
-      const apiRepos = `https://api.github.com/users/${usuarioGitHub}/repos`;
-      const converter = new showdown.Converter({ headerLevelStart: 3 });
+    const usuarioGitHub = "dragonmoon1522";
+    const repoPrincipal = usuarioGitHub + ".github.io";
+    const converter = new showdown.Converter({
+      tables: true,
+      strikethrough: true,
+      tasklists: true,
+      ghCodeBlocks: true,
+      simplifiedAutoLink: true
+    });
+    const archivosReadme = ["README.md", "readme.md", "Readme.md"];
+    const archivosVersion = ["version.md", "VERSION.md", "Version.md"];
 
-      try {
-        const respuesta = await fetch(apiRepos);
-        const repos = await respuesta.json();
-        const proyectos = [];
+    async function leerMarkdown(baseURL, nombres) {
+      for (const nombre of nombres) {
+        try {
+          const respuesta = await fetch(baseURL + nombre, { cache: "no-store" });
+          if (respuesta.ok) return { nombre, texto: await respuesta.text() };
+        } catch (_) {}
+      }
+      return null;
+    }
 
-        for (let repo of repos) {
-          const baseURL = `https://raw.githubusercontent.com/${usuarioGitHub}/${repo.name}/main/`;
-          const pageURL = `https://${usuarioGitHub}.github.io/${repo.name}/`;
-          const archivos = ["README.md", "readme.md", "VERSION.md", "version.md", "LICENSE.md"];
-          let readmeText = "", versionText = "", licenseText = "", titulo = repo.name;
+    function obtenerVersion(texto) {
+      const coincidencia = texto.match(/\b\d+\.\d+\.\d+\b/) || texto.match(/\b\d+\.\d+\b/);
+      return coincidencia ? coincidencia[0] : "";
+    }
 
-          for (let archivo of archivos) {
-            try {
-              const res = await fetch(baseURL + archivo);
-              if (res.ok) {
-                const texto = await res.text();
-                if (archivo.toLowerCase().includes("readme")) readmeText = texto;
-                if (archivo.toLowerCase().includes("version")) versionText = texto;
-                if (archivo.toLowerCase().includes("license")) licenseText = texto;
-              }
-            } catch {}
+    function fragmentoMarkdown(texto, repo, rama, archivo, sufijo) {
+      const contenedor = document.createElement("div");
+      contenedor.className = "markdown";
+      if (!window.showdown || !window.DOMPurify) {
+        const respaldo = document.createElement("pre");
+        respaldo.textContent = texto;
+        contenedor.appendChild(respaldo);
+        return contenedor;
+      }
+
+      const htmlSeguro = DOMPurify.sanitize(converter.makeHtml(texto), {
+        USE_PROFILES: { html: true }
+      });
+      contenedor.innerHTML = htmlSeguro;
+
+      const ramaURL = rama.split("/").map(encodeURIComponent).join("/");
+      const archivoRaw = "https://raw.githubusercontent.com/" + usuarioGitHub + "/" +
+        encodeURIComponent(repo) + "/" + ramaURL + "/" + archivo;
+      const archivoGitHub = "https://github.com/" + usuarioGitHub + "/" +
+        encodeURIComponent(repo) + "/blob/" + ramaURL + "/" + archivo;
+      const prefijo = "repo-" + repo.toLowerCase().replace(/[^a-z0-9]+/g, "-") + "-" + sufijo;
+      const mapaIds = new Map();
+
+      contenedor.querySelectorAll("[id]").forEach(function (nodo) {
+        const anterior = nodo.id;
+        const nuevo = prefijo + "-" + anterior;
+        mapaIds.set(anterior, nuevo);
+        nodo.id = nuevo;
+      });
+
+      contenedor.querySelectorAll('a[href^="#"]').forEach(function (enlace) {
+        const anterior = decodeURIComponent(enlace.getAttribute("href").slice(1));
+        if (mapaIds.has(anterior)) enlace.setAttribute("href", "#" + mapaIds.get(anterior));
+      });
+
+      contenedor.querySelectorAll("a[href]").forEach(function (enlace) {
+        const href = enlace.getAttribute("href");
+        if (!href || href.startsWith("#")) return;
+        try {
+          const destino = new URL(href, archivoGitHub);
+          if (!["http:", "https:", "mailto:"].includes(destino.protocol)) {
+            enlace.removeAttribute("href");
+            return;
           }
-
-          let readmeHtml = "", descripcion = "", version = "", licenseHtml = "";
-
-          if (readmeText) {
-            const lineas = readmeText.split("\n");
-            const encabezado = lineas.find(l => l.trim().startsWith("#"));
-            titulo = encabezado ? encabezado.replace(/^#+\s*/, "").trim() : titulo;
-
-            // Extraer descripción
-            let capturando = false;
-            let bloques = [];
-            for (let l of lineas) {
-              if (l.toLowerCase().includes("descripción del proyecto")) {
-                capturando = true;
-                continue;
-              }
-              if (capturando) {
-                if (l.trim().startsWith("###") || l.trim() === "---") break;
-                bloques.push(l);
-              }
-            }
-            descripcion = bloques.join("\n");
-            readmeHtml = converter.makeHtml(readmeText);
-          }
-
-          if (versionText) {
-            const lineas = versionText.split("\n");
-            for (let i = 0; i < lineas.length; i++) {
-              const match = lineas[i].match(/(\d+\.\d+\.\d+)/);
-              if (match) {
-                version = match[0];
-                break;
-              }
-            }
-          }
-
-          if (repo.name === repoPrincipal) {
-            licenseHtml = licenseText ? converter.makeHtml(licenseText) : "";
-            proyectos.unshift({
-              titulo,
-              url: pageURL,
-              readme: readmeHtml,
-              version,
-              license: licenseHtml
-            });
-          } else {
-            proyectos.push({
-              titulo,
-              url: pageURL,
-              descripcion: descripcion ? converter.makeHtml(descripcion) : "",
-              version
-            });
-          }
+          enlace.href = destino.href;
+          enlace.target = "_blank";
+          enlace.rel = "noopener noreferrer";
+        } catch (_) {
+          enlace.removeAttribute("href");
         }
+      });
 
-        cargarProyectos(proyectos);
-      } catch {
-        document.getElementById("versiones").innerText = "No se pudo cargar la lista de proyectos.";
+      contenedor.querySelectorAll("img[src]").forEach(function (imagen) {
+        try {
+          const destino = new URL(imagen.getAttribute("src"), archivoRaw);
+          if (destino.protocol === "https:") imagen.src = destino.href;
+          else imagen.removeAttribute("src");
+        } catch (_) {
+          imagen.removeAttribute("src");
+        }
+      });
+      return contenedor;
+    }
+
+    function agregarDetalle(tarjeta, titulo, contenido, repo, rama, archivo, sufijo) {
+      if (!contenido) return;
+      const detalle = document.createElement("details");
+      detalle.className = "project-details";
+      const resumen = document.createElement("summary");
+      resumen.textContent = titulo;
+      detalle.appendChild(resumen);
+      detalle.appendChild(fragmentoMarkdown(contenido.texto, repo, rama, contenido.nombre, sufijo));
+      tarjeta.appendChild(detalle);
+    }
+
+    async function cargarProyecto(repo) {
+      const rama = repo.default_branch || "main";
+      const ramaURL = rama.split("/").map(encodeURIComponent).join("/");
+      const baseURL = "https://raw.githubusercontent.com/" + usuarioGitHub + "/" +
+        encodeURIComponent(repo.name) + "/" + ramaURL + "/";
+      const resultados = await Promise.all([
+        leerMarkdown(baseURL, archivosReadme),
+        leerMarkdown(baseURL, archivosVersion)
+      ]);
+      return {
+        repo: repo,
+        rama: rama,
+        readme: resultados[0],
+        versiones: resultados[1],
+        numeroVersion: resultados[1] ? obtenerVersion(resultados[1].texto) : ""
+      };
+    }
+
+    function crearTarjeta(proyecto) {
+      const repo = proyecto.repo;
+      const tarjeta = document.createElement("article");
+      tarjeta.className = "proyecto";
+
+      const encabezado = document.createElement("div");
+      encabezado.className = "proyecto-header";
+      const titulo = document.createElement("h3");
+      const enlaceRepo = document.createElement("a");
+      enlaceRepo.href = repo.html_url;
+      enlaceRepo.target = "_blank";
+      enlaceRepo.rel = "noopener noreferrer";
+      enlaceRepo.textContent = repo.name;
+      titulo.appendChild(enlaceRepo);
+      encabezado.appendChild(titulo);
+
+      if (repo.archived) {
+        const estado = document.createElement("span");
+        estado.className = "project-status archived";
+        estado.textContent = "Archivado";
+        encabezado.appendChild(estado);
+      }
+      tarjeta.appendChild(encabezado);
+
+      if (repo.description) {
+        const descripcion = document.createElement("p");
+        descripcion.textContent = repo.description;
+        tarjeta.appendChild(descripcion);
+      }
+
+      if (proyecto.numeroVersion) {
+        const version = document.createElement("p");
+        version.className = "project-version";
+        version.textContent = "Versión identificada: " + proyecto.numeroVersion;
+        tarjeta.appendChild(version);
+      }
+
+      agregarDetalle(tarjeta, "README (vista HTML)", proyecto.readme, repo.name, proyecto.rama, "README.md", "readme");
+      agregarDetalle(tarjeta, "Historial de versiones (vista HTML)", proyecto.versiones, repo.name, proyecto.rama, "version.md", "versiones");
+
+      if (!proyecto.readme) {
+        const nota = document.createElement("p");
+        nota.textContent = "No se encontró un README en la rama " + proyecto.rama + ".";
+        tarjeta.appendChild(nota);
+      }
+      if (!proyecto.versiones) {
+        const nota = document.createElement("p");
+        nota.textContent = "Este repositorio no tiene un archivo version.md.";
+        tarjeta.appendChild(nota);
+      }
+      return tarjeta;
+    }
+
+    async function obtenerRepositorios() {
+      const contenedor = document.getElementById("versiones");
+      try {
+        const respuesta = await fetch(
+          "https://api.github.com/users/" + usuarioGitHub + "/repos?per_page=100&sort=updated",
+          { headers: { Accept: "application/vnd.github+json" } }
+        );
+        if (!respuesta.ok) throw new Error("GitHub respondió " + respuesta.status);
+        const repos = await respuesta.json();
+        const visibles = repos.filter(function (repo) {
+          return !repo.private && repo.name !== repoPrincipal;
+        });
+        const proyectos = await Promise.all(visibles.map(cargarProyecto));
+        contenedor.replaceChildren();
+
+        if (!proyectos.length) {
+          contenedor.textContent = "No hay repositorios públicos para mostrar.";
+          return;
+        }
+        proyectos.forEach(function (proyecto) {
+          contenedor.appendChild(crearTarjeta(proyecto));
+        });
+        contenedor.setAttribute("role", "region");
+        contenedor.removeAttribute("aria-live");
+      } catch (_) {
+        contenedor.className = "mensaje-error";
+        contenedor.textContent = "No se pudo cargar la lista de repositorios públicos de GitHub.";
       }
     }
 
-    function cargarProyectos(proyectos) {
-      const contenedor = document.getElementById("versiones");
-      contenedor.innerHTML = "";
-
-      proyectos.forEach(p => {
-        const div = document.createElement("div");
-        div.className = "proyecto";
-
-        let html = `<h3><a href="${p.url}" target="_blank">${p.titulo}</a></h3>`;
-
-        if (p.readme) html += `<div class="markdown">${p.readme}</div>`;
-        else html += `<div class="markdown">${p.descripcion || "Descripción no disponible."}</div>`;
-
-        if (p.version) html += `<p><strong>Última versión:</strong> ${p.version}</p>`;
-        if (p.license) html += `<div class="markdown">${p.license}</div>`;
-
-        div.innerHTML = html;
-        contenedor.appendChild(div);
-      });
-    }
-
-    obtenerRepositorios();
+    document.addEventListener("DOMContentLoaded", obtenerRepositorios);
   </script>
 
   <hr />
