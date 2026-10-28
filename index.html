@@ -95,13 +95,16 @@
   <script>
     const usuarioGitHub = "dragonmoon1522";
     const repoPrincipal = usuarioGitHub + ".github.io";
-    const converter = new showdown.Converter({
-      tables: true,
-      strikethrough: true,
-      tasklists: true,
-      ghCodeBlocks: true,
-      simplifiedAutoLink: true
-    });
+    let converter = null;
+    function crearConversor() {
+      return new showdown.Converter({
+        tables: true,
+        strikethrough: true,
+        tasklists: true,
+        ghCodeBlocks: true,
+        simplifiedAutoLink: true
+      });
+    }
     const archivosReadme = ["README.md", "readme.md", "Readme.md"];
     const archivosVersion = ["version.md", "VERSION.md", "Version.md"];
 
@@ -296,7 +299,10 @@
       }
     }
 
-    document.addEventListener("DOMContentLoaded", obtenerRepositorios);
+    document.addEventListener("DOMContentLoaded", function () {
+      if (window.showdown) converter = crearConversor();
+      obtenerRepositorios();
+    });
   </script>
 
   <hr />
