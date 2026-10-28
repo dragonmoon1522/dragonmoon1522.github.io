@@ -1,63 +1,45 @@
-## **KathWare GitHub Pages**
+## KathWare GitHub Pages
 
-**Autora:** Katherine Vargas | [(KathWare)](https://kathware.com.ar)  
-**Última actualización:** 2025-07-08  
+**Autora:** Katherine Vargas | [KathWare](https://kathware.com.ar)  
+**Última actualización:** 2026-10-27
 
 ---
 
-### **Descripción del Proyecto**
+### Descripción
 
-Este repositorio funciona como el **núcleo público del ecosistema KathWare**, y actúa como sitio GitHub Pages en:  
+Este repositorio contiene el portal público de proyectos de KathWare en GitHub Pages:
+
 [https://dragonmoon1522.github.io](https://dragonmoon1522.github.io)
 
-Incluye:
+La página principal consulta la lista pública de repositorios de GitHub y, para cada repositorio salvo este portal, presenta:
 
-- La **Licencia de Accesibilidad Universal (LAU)** como base ética y legal para todos los proyectos del ecosistema.
-- Un sistema automatizado que muestra los proyectos activos en GitHub, siempre que tengan `README.md` y `version.md`.
-- Extracción dinámica de descripciones desde `README.md` y versiones desde `version.md`.
-- Integración con LinkedIn y enlaces a políticas, normas de uso y medios de contribución.  
+- el nombre y la descripción del repositorio;
+- el README completo, convertido de Markdown a HTML;
+- el historial de versiones, si existe un archivo de versiones;
+- enlaces e imágenes relativos resueltos contra la rama predeterminada del repositorio;
+- una marca para repositorios archivados.
 
----
+El contenido Markdown se sanea antes de insertarlo en la página. Los repositorios privados no se muestran porque la lista se obtiene de la API pública de GitHub.
 
-### **Tecnologías utilizadas**
+### Tecnologías
 
-- HTML, CSS y JavaScript puro.
+- HTML, CSS y JavaScript.
 - API pública de GitHub.
-- Librería **Showdown.js** para conversión Markdown a HTML.
+- Showdown para convertir Markdown a HTML.
+- DOMPurify para sanear el HTML generado.
 
----
+### Licencias
 
-### **Licencias y manifiestos**
+La licencia aplicable a cada proyecto se indica en su propio repositorio o documentación. Publicar un proyecto en el ecosistema KathWare no lo asigna automáticamente a LAU.
 
-- [Licencia de Accesibilidad Universal (LAU) — Español](./licenses/lau/lau-v1.1-es.md)  
-- [Universal Accessibility License (LAU) — English](./licenses/lau/lau-v1.1-en.md)  
-- [Manifiesto de la LAU](./licenses/lau/manifesto.md)  
+La LAU puede consultarse en [kathware.com.ar/lau](https://kathware.com.ar/lau/). Las condiciones de este sitio figuran en [Normas de uso y licencias de KathWare](https://kathware.com.ar/normas-de-uso-y-licencias-de-kathware/).
 
-> Todos los proyectos del ecosistema KathWare están protegidos por la LAU.
+El contenido de este repositorio se distribuye bajo [LICENSE.md](./LICENSE.md).
 
----
+### Historial de versiones
 
-### **Proyectos activos**
+[Consultar el historial de versiones](./version.md)
 
-Los proyectos se muestran automáticamente desde este mismo repositorio en tiempo real:  
-[Ver proyectos en el sitio](https://dragonmoon1522.github.io)
+### Contribuciones
 
----
-
-### **Historial de versiones del núcleo**
-
-[Consultar `version.md`](./version.md)
-
----
-
-### **Cómo contribuir**
-
-Si deseas mejorar este proyecto, puedes hacer un **pull request** o reportar problemas en la sección de **Issues**.  
-También podés apoyar el proyecto a través de donaciones o difusión.
-
----
-
-### **Licencia de este sitio**
-
-Este contenido está licenciado bajo **Creative Commons BY-NC-SA 4.0**.  
-Más información en: [Normas de uso y licencias de KathWare](https://kathware.com.ar/normas-de-uso-y-licencias-de-kathware/)
+Podés proponer mejoras mediante un pull request o reportar un problema en la sección de Issues.
